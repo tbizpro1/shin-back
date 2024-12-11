@@ -91,7 +91,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Arquivo 'services.py' criado em '{app_dir}'"))
 
     def add_to_settings(self, app_path):
-        # Ajuste para localizar o settings.py dentro de 'core'
         settings_file = os.path.join(os.getcwd(), "core", "settings.py")
 
         if not os.path.exists(settings_file):
