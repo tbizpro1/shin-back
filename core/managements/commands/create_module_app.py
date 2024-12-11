@@ -88,7 +88,7 @@ class Command(BaseCommand):
             f.write(
                 "# Services"
             )
-        self.stdout.write(self.style.SUCCESS(f"Arquivo 'controllers.py' criado em '{app_dir}'"))
+        self.stdout.write(self.style.SUCCESS(f"Arquivo 'services.py' criado em '{app_dir}'"))
 
     def add_to_settings(self, app_path):
         # Ajuste para localizar o settings.py dentro de 'core'
