@@ -5,11 +5,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
 SECRET_KEY = 'django-insecure-nae7tcuk6_jh*q4(j^q_&kz!b%6^44vjjr#a(n2v$en3ol9vgu'  # Substitua em produção
-DEBUG = True  # Desative em produção
-ALLOWED_HOSTS = []  # Adicione domínios ou IPs em produção
+DEBUG = True 
+ALLOWED_HOSTS = [] 
 
 # Applications
-INSTALLED_APPS = [
+
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -17,6 +18,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+THIRD_PARTY_APPS = [
+    'ninja',
+    'ninja_extra',
+    'ninja_jwt',
+]
+
+LOCAL_APPS= [
+    'core',
+    'modules.user',
+    'modules.token',
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # Middleware
 MIDDLEWARE = [
