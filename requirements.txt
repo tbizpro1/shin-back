@@ -45,6 +45,7 @@ poetry-core==1.9.1
 poetry-plugin-export==1.8.0
 psycopg2==2.9.10
 ptyprocess==0.7.0
+django-extensions==3.2.4
 pycparser==2.22
 pydantic==2.10.3
 pydantic_core==2.27.1
