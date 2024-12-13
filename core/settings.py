@@ -10,7 +10,7 @@ if ENVIRONMENT == 'production':
     environ.Env.read_env('.env.production')
 else:
     environ.Env.read_env('.env.local')
-# Paths
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env_file = os.path.join(BASE_DIR, '.env.local')
@@ -56,6 +56,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,6 +64,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # URL Configuration
 ROOT_URLCONF = 'core.urls'
@@ -113,9 +117,12 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Diretórios adicionais de arquivos estáticos (se necessário)
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+if ENVIRONMENT == 'production':
+    STATICFILES_DIRS = []
+else:
+    STATICFILES_DIRS = [
+        BASE_DIR / 'static',
+    ]
 
 # Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
