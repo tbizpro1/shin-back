@@ -1,0 +1,68 @@
+# Sistema operacional
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+__pycache__/
+db.sqlite3
+*.pyc
+*.pyo
+*.log
+*.pot
+__pycache__/
+*.mo
+*.swp
+
+# Ambiente Virtual
+venv/
+.env
+.env.*
+
+# Configuração de IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos e pastas gerados
+media/
+staticfiles/
+*.bak
+*.tmp
+*.old
+*.orig
+*.rej
+
+# Logs
+*.log
+
+# Migrations geradas automaticamente
+*/migrations/*
+
+# Exclui arquivos de testes
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+*.cover
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.pytest_cache/
+
+# Arquivos Gunicorn
+gunicorn.log
+gunicorn.error.log
+
+# Arquivos de Docker (se aplicável)
+docker-compose.override.yml
+*.dockerignore
+
+# Configuração de Deploys Render/Heroku
+*.render
+.heroku
