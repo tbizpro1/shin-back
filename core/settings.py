@@ -23,7 +23,7 @@ else:
 # Security
 SECRET_KEY = env('SECRET_KEY')  # Substitua em produção
 DEBUG = env.bool('DEBUG', default=False) 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Applications
 AUTH_USER_MODEL = 'user.User'  # Substitua pelo nome do seu app e modelo
