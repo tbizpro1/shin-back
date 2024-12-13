@@ -41,23 +41,4 @@ class UsersController:
     def put_picture(self, request, id: int, profile_picture: UploadedFile = File(...)):
         return self.services.put_picture(id=id, file=profile_picture)
 
-    @route.post('/user-register', response={201: RegisterResponseSchema, 400: ErrorResponse}, auth=None)
-    def register(self, request, payload: RegisterSchema = Form(...)):
-        try:
-            # Hashing a senha
-            payload.password = self.services.repository.password_hash(payload.password)
-            
-            # Criando o usuário
-            user = self.services.repository.model.objects.create(
-                username=payload.username,
-                email=payload.email,
-                password=payload.password,
-                role=payload.role
-            )
-            return 201, RegisterResponseSchema(
-                id=user.id,
-                username=user.username,
-                email=user.email
-            )
-        except Exception as e:
-            raise HttpError(400, f"Error during user registration: {str(e)}")
+    
