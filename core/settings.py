@@ -1,14 +1,32 @@
 from pathlib import Path
+import environ
+import os
 
+ENVIRONMENT = os.getenv('DJANGO_ENV', 'local')
+print(f"ENVIRONMENT: {ENVIRONMENT}")
+
+env = environ.Env()
+if ENVIRONMENT == 'production':
+    environ.Env.read_env('.env.production')
+else:
+    environ.Env.read_env('.env.local')
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_file = os.path.join(BASE_DIR, '.env.local')
+if os.path.exists(env_file):
+    print(f"Carregando variáveis de ambiente de {env_file}")
+    environ.Env.read_env(env_file)
+else:
+    print(f"Arquivo {env_file} não encontrado")
+
 # Security
-SECRET_KEY = 'django-insecure-nae7tcuk6_jh*q4(j^q_&kz!b%6^44vjjr#a(n2v$en3ol9vgu'  # Substitua em produção
-DEBUG = True 
-ALLOWED_HOSTS = [] 
+SECRET_KEY = env('SECRET_KEY')  # Substitua em produção
+DEBUG = env.bool('DEBUG', default=False) 
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 
 # Applications
+AUTH_USER_MODEL = 'user.User'  # Substitua pelo nome do seu app e modelo
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -23,6 +41,8 @@ THIRD_PARTY_APPS = [
     'ninja',
     'ninja_extra',
     'ninja_jwt',
+    'django_extensions', 
+
 ]
 
 LOCAL_APPS= [
@@ -69,10 +89,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3'),
 }
 
 # Password Validation
@@ -85,12 +102,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Localization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
 # Static Files
 STATIC_URL = 'static/'
+
+# Diretório onde os arquivos estáticos serão coletados
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Diretórios adicionais de arquivos estáticos (se necessário)
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
