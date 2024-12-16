@@ -44,6 +44,8 @@ THIRD_PARTY_APPS = [
     'ninja_extra',
     'ninja_jwt',
     'django_extensions', 
+    'corsheaders',
+
 
 ]
 
@@ -58,6 +60,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  
     'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -125,6 +128,10 @@ else:
     STATICFILES_DIRS = [
         BASE_DIR / 'static',
     ]
+
+#Cors
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 # Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
