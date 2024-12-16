@@ -5,7 +5,9 @@ import os
 ENVIRONMENT = os.getenv('DJANGO_ENV', 'production')
 print(f"ENVIRONMENT: {ENVIRONMENT}")
 
-env = environ.Env()
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 if ENVIRONMENT == 'production':
     environ.Env.read_env('.env.production')
 else:
@@ -21,12 +23,12 @@ else:
     print(f"Arquivo {env_file} não encontrado")
 
 # Security
-SECRET_KEY = env('SECRET_KEY')  # Substitua em produção
+SECRET_KEY = env('SECRET_KEY') 
 DEBUG = env.bool('DEBUG', default=False) 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Applications
-AUTH_USER_MODEL = 'user.User'  # Substitua pelo nome do seu app e modelo
+AUTH_USER_MODEL = 'user.User'  
 
 DJANGO_APPS = [
     'django.contrib.admin',

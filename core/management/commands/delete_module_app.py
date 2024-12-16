@@ -18,7 +18,6 @@ class Command(BaseCommand):
             os.makedirs(base_dir)
             self.stdout.write(self.style.SUCCESS(f"Criada a pasta 'modules' em {base_dir}"))
 
-        # Diretório do novo app dentro de 'modules'
         app_dir = os.path.join(base_dir, app_name)
         
         if os.path.exists(app_dir):
