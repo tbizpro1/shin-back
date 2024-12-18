@@ -24,6 +24,9 @@ class UserListSchema(Schema):
     id: int
     username: str
     email: str
+    phone: str
+    linkedin: str
+    profession: str
     role: str
     profile_picture: Optional[str] = None
     date_joined: datetime
