@@ -2,7 +2,7 @@ from pathlib import Path
 import environ
 import os
 
-ENVIRONMENT = os.getenv('DJANGO_ENV', 'local')
+ENVIRONMENT = os.getenv('DJANGO_ENV', 'prodution')
 print(f"ENVIRONMENT: {ENVIRONMENT}")
 
 env = environ.Env(
@@ -53,6 +53,9 @@ LOCAL_APPS= [
     'core',
     'modules.user',
     'modules.token',
+    'modules.enterprise',
+    'modules.user_enterprise',
+    'modules.activity_history',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
