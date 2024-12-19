@@ -17,6 +17,7 @@ class Enterprise(models.Model):
     linkedin = models.URLField(max_length=255, null=True, blank=True)
     name_foment = models.CharField(max_length=255, null=True, blank=True)
     programm = models.CharField(max_length=255, null=True, blank=True)
+    file = models.ImageField(upload_to='enterprise_files/', null=True, blank=True)
 
     # Booleans
     invested = models.BooleanField(default=False)
@@ -26,8 +27,7 @@ class Enterprise(models.Model):
     value_invested = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     value_foment = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
 
-    # Keys (Foreign Keys or Custom Fields)
-    field = models.CharField(max_length=255)
+
 
     def __str__(self):
         return f"{self.name} - {self.value_proposition[:30]}..."

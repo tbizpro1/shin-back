@@ -4,6 +4,7 @@ from ninja_jwt.authentication import JWTAuth
 from django.contrib.admin.views.decorators import staff_member_required
 
 
+from modules.enterprise.controllers import EnterpriseController
 
 from modules.user.controllers import UsersController
 from modules.token.controllers import TokenController
@@ -35,3 +36,6 @@ api.register_controllers(UsersController)
 
 # Core Controllers
 api.register_controllers(TokenController)
+
+# Enterprise Controllers
+api.register_controllers(EnterpriseController)
