@@ -54,6 +54,7 @@ class Services:
                 instance = cls.repository.post(payload=payload, file=file)
                 return status.HTTP_201_CREATED, instance
         except IntegrityError as error:
+            print(f"o err é esse aqui:{error}")
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
 
     @classmethod
