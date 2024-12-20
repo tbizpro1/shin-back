@@ -48,10 +48,11 @@ class EnterpriseController:
         return self.services.post(payload=payload.dict(), file=file)
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
-    def put(self, request, id: int, payload: EnterprisePutSchema = Form(...)):
+    def put(self, request, id: int, payload: EnterprisePutSchema):
         """
         Atualiza os dados de uma empresa existente.
         """
+        print(f"esse é o payload enterprise {payload}")
         return self.services.put(id=id, payload=payload.dict())
 
     @route.delete('/{id}', response={204: None})
