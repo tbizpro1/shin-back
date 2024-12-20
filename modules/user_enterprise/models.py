@@ -1,6 +1,6 @@
 from django.db import models
-from modules.user.models import User  # Importa o modelo User
-from modules.enterprise.models import Enterprise  # Importa o modelo Enterprise
+from modules.user.models import User  
+from modules.enterprise.models import Enterprise  
 
 class UserEnterprise(models.Model):
     ue_id = models.AutoField(primary_key=True)

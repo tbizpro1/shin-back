@@ -5,7 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 
 from modules.enterprise.controllers import EnterpriseController
-
+from modules.user_enterprise.controllers import UserEnterpriseController
 from modules.user.controllers import UsersController
 from modules.token.controllers import TokenController
 
@@ -39,3 +39,6 @@ api.register_controllers(TokenController)
 
 # Enterprise Controllers
 api.register_controllers(EnterpriseController)
+
+# User_Enterprise Controllers
+api.register_controllers(UserEnterpriseController)
