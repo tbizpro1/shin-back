@@ -7,6 +7,7 @@ from modules.user_enterprise.schemas import (
     UserEnterprisePutSchema,
     ErrorResponse,
 )
+from modules.user_enterprise.models import UserEnterprise
 
 @api_controller(
     '/user-enterprises',
@@ -33,6 +34,7 @@ class UserEnterpriseController:
                 "enterprise_id": ue.enterprise.enterprise_id,
                 "enterprise_name": ue.enterprise.name,
                 "role": ue.role,
+                "status": ue.status,
             }
             for ue in user_enterprises
         ]
@@ -50,6 +52,7 @@ class UserEnterpriseController:
             "enterprise_id": user_enterprise.enterprise.enterprise_id,
             "enterprise_name": user_enterprise.enterprise.name,
             "role": user_enterprise.role,
+            "status": user_enterprise.status,
         }
 
     @route.post('', response={200: UserEnterpriseListSchema, 500: ErrorResponse}, auth=None)
@@ -65,8 +68,8 @@ class UserEnterpriseController:
             "enterprise_id": user_enterprise.enterprise.enterprise_id,
             "enterprise_name": user_enterprise.enterprise.name,
             "role": user_enterprise.role,
+            "status": user_enterprise.status,
         }
-
 
     @route.put('/{id}', response={200: UserEnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: UserEnterprisePutSchema):
@@ -81,6 +84,47 @@ class UserEnterpriseController:
             "enterprise_id": user_enterprise.enterprise.enterprise_id,
             "enterprise_name": user_enterprise.enterprise.name,
             "role": user_enterprise.role,
+            "status": user_enterprise.status,
+        }
+
+    @route.put('/accept/{id}', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
+    def accept(self, request, id: int):
+        """
+        Aceita um convite, atualizando o status para 'accepted'.
+        """
+        user_enterprise = self.repository.get(id=id)
+        if user_enterprise.status != 'pending':
+            return {"message": "Convite já foi aceito ou recusado."}, 400
+        user_enterprise.status = 'accepted'
+        user_enterprise.save()
+        return {
+            "ue_id": user_enterprise.ue_id,
+            "user_id": user_enterprise.user.id,
+            "username": user_enterprise.user.username,
+            "enterprise_id": user_enterprise.enterprise.enterprise_id,
+            "enterprise_name": user_enterprise.enterprise.name,
+            "role": user_enterprise.role,
+            "status": user_enterprise.status,
+        }
+
+    @route.put('/decline/{id}', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
+    def decline(self, request, id: int):
+        """
+        Recusa um convite, atualizando o status para 'declined'.
+        """
+        user_enterprise = self.repository.get(id=id)
+        if user_enterprise.status != 'pending':
+            return {"message": "Convite já foi aceito ou recusado."}, 400
+        user_enterprise.status = 'declined'
+        user_enterprise.save()
+        return {
+            "ue_id": user_enterprise.ue_id,
+            "user_id": user_enterprise.user.id,
+            "username": user_enterprise.user.username,
+            "enterprise_id": user_enterprise.enterprise.enterprise_id,
+            "enterprise_name": user_enterprise.enterprise.name,
+            "role": user_enterprise.role,
+            "status": user_enterprise.status,
         }
 
     @route.delete('/{id}', response={204: None})
@@ -105,6 +149,7 @@ class UserEnterpriseController:
                 "enterprise_id": ue.enterprise.enterprise_id,
                 "enterprise_name": ue.enterprise.name,
                 "role": ue.role,
+                "status": ue.status,
             }
             for ue in user_enterprises
         ]
@@ -123,6 +168,7 @@ class UserEnterpriseController:
                 "enterprise_id": ue.enterprise.enterprise_id,
                 "enterprise_name": ue.enterprise.name,
                 "role": ue.role,
+                "status": ue.status,
             }
             for ue in user_enterprises
         ]

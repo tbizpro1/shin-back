@@ -11,10 +11,23 @@ class UserEnterprise(models.Model):
     
     role = models.CharField(max_length=50)
 
+    INVITATION_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    status = models.CharField(
+        max_length=20, 
+        choices=INVITATION_STATUS_CHOICES, 
+        default='pending', 
+        verbose_name="Invitation Status"
+    )
+
     class Meta:
         verbose_name = "User Enterprise"
         verbose_name_plural = "User Enterprises"
         db_table = "user_enterprise"
 
     def __str__(self):
-        return f"{self.user.username} - {self.enterprise.name} - {self.role}"
+        return f"{self.user.username} - {self.enterprise.name} - {self.role} ({self.status})"
