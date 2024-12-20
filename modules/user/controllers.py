@@ -29,10 +29,11 @@ class UsersController:
         
         return self.services.post(payload=payload.dict(), file=profile_picture)
     
-    @route.put('/{id}', response={201: UserListSchema, 400: ErrorResponse, 500: ErrorResponse})
-    def put(self, request, id: int, payload: UserPutSchema = Form(...)):
+    @route.put('/{id}', response={200: UserListSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def put(self, request, id: int, payload: UserPutSchema):
+        print(f"Payload recebido no controlador: {payload.dict()}")
         return self.services.put(id=id, payload=payload.dict())
-    
+
     @route.delete('/{id}', response={204: None})
     def delete(self, request, id: int):
         return self.services.delete(id=id)

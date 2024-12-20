@@ -24,9 +24,9 @@ class UserPutSchema(Schema):
     username: Optional[str] = Field(None, alias="username", title="Nome de usuário")
     email: Optional[str] = Field(None, alias="email", title="Email")
     password: Optional[str] = Field(None, alias="password", title="Senha")
-    phone: Optional[str] = Field(None, alias="phone", title="Telefone")  
-    linkedin: Optional[str] = Field(None, alias="linkedin", title="LinkedIn")  
-    profession: Optional[str] = Field(None, alias="profession", title="Profissão")  
+    phone: Optional[str] = Field(None, alias="phone", title="Telefone")
+    linkedin: Optional[str] = Field(None, alias="linkedin", title="LinkedIn")
+    profession: Optional[str] = Field(None, alias="profession", title="Profissão")
     role: Optional[RoleFilterEnum] = None
 
 

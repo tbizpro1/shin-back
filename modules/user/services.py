@@ -65,29 +65,33 @@ class Services:
         payload: Dict[str, Any],
         **kwargs
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
-        
         try:
             with transaction.atomic():
-                status_code: int
-                message: Dict[str, str]
+                print(f"esse é o payload {payload}")
 
-                status_code, message_or_object = cls.validate_payload(
-                    payload=payload, id=id
-                )
+                # Validação do payload
+                status_code, message_or_object = cls.validate_payload(payload=payload, id=id)
 
                 if status_code != status.HTTP_200_OK:
-                    message: Dict[str, str] = message_or_object
-                    return status_code, message
-                
+                    return status_code, message_or_object
+
                 instance: models.Model = message_or_object
 
+                # Atualizar a instância no repositório
                 instance = cls.repository.put(
                     instance=instance, payload=payload, id=id,
                 )
-                return status.HTTP_201_CREATED, instance
-            
+
+                # Retornar status 200 para atualização bem-sucedida
+                return status.HTTP_200_OK, instance
+
         except IntegrityError as error:
+            # Erro de integridade do banco de dados
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+
+        except Exception as error:
+            # Qualquer outro erro
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": f"Erro inesperado: {str(error)}"}
         
     @classmethod
     def delete(
