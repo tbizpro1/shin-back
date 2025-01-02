@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
 from ninja import Schema, Field
+from datetime import datetime
 
 class RoleEnum(str, Enum):
     owner = "owner"
@@ -21,6 +22,9 @@ class UserEnterprisePutSchema(Schema):
     enterprise_id: Optional[int] = Field(None, alias="enterprise_id", title="ID da empresa")
     role: Optional[RoleEnum] = Field(None, alias="role", title="Papel do usuário na empresa")
     status: Optional[StatusEnum] = Field(None, alias="status", title="Status do convite")
+    
+    send_at: Optional[datetime] = None  
+    accept_at: Optional[datetime] = None  
 
 class UserEnterpriseListSchema(Schema):
     ue_id: int = Field(..., alias="ue_id", title="ID da relação")
@@ -30,6 +34,8 @@ class UserEnterpriseListSchema(Schema):
     enterprise_name: str = Field(..., alias="enterprise_name", title="Nome da empresa")
     role: str = Field(..., alias="role", title="Papel do usuário na empresa")
     status: str = Field(..., alias="status", title="Status do convite")
+    send_at: Optional[datetime] = Field(None, alias="send_at", title="Data e hora do envio do convite")
+    accept_at: Optional[datetime] = Field(None, alias="accept_at", title="Data e hora do aceite do convite")
 
 class ErrorResponse(Schema):
     message: str
