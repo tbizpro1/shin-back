@@ -7,6 +7,8 @@ from modules.user_enterprise.schemas import (
     UserEnterprisePutSchema,
     ErrorResponse,
 )
+from datetime import datetime
+from django.http import Http404
 from modules.user_enterprise.models import UserEnterprise
 
 @api_controller(
@@ -14,17 +16,13 @@ from modules.user_enterprise.models import UserEnterprise
     tags=['Rota - User Enterprises']
 )
 class UserEnterpriseController:
-    """
-    Controller para gerenciar operações relacionadas ao modelo UserEnterprise.
-    """
+  
 
     repository = UserEnterpriseRepository
 
     @route.get('', response={200: List[UserEnterpriseListSchema]}, auth=None)
     def list(self, request):
-        """
-        Retorna a lista de relações UserEnterprise cadastradas.
-        """
+        
         user_enterprises = self.repository.list()
         return [
             {
@@ -35,15 +33,15 @@ class UserEnterpriseController:
                 "enterprise_name": ue.enterprise.name,
                 "role": ue.role,
                 "status": ue.status,
+                "token": ue.token,
+
             }
             for ue in user_enterprises
         ]
 
     @route.get('/{id}', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
     def get(self, request, id: int):
-        """
-        Retorna os detalhes de uma relação UserEnterprise pelo ID.
-        """
+     
         user_enterprise = self.repository.get(id=id)
         return {
             "ue_id": user_enterprise.ue_id,
@@ -87,45 +85,40 @@ class UserEnterpriseController:
             "status": user_enterprise.status,
         }
 
-    @route.put('/accept/{id}', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
-    def accept(self, request, id: int):
-        """
-        Aceita um convite, atualizando o status para 'accepted'.
-        """
-        user_enterprise = self.repository.get(id=id)
-        if user_enterprise.status != 'pending':
-            return {"message": "Convite já foi aceito ou recusado."}, 400
-        user_enterprise.status = 'accepted'
-        user_enterprise.save()
-        return {
-            "ue_id": user_enterprise.ue_id,
-            "user_id": user_enterprise.user.id,
-            "username": user_enterprise.user.username,
-            "enterprise_id": user_enterprise.enterprise.enterprise_id,
-            "enterprise_name": user_enterprise.enterprise.name,
-            "role": user_enterprise.role,
-            "status": user_enterprise.status,
-        }
+    @route.put('/invitation/{token}/', response={200: UserEnterpriseListSchema, 404: ErrorResponse}, auth=None)
+    def accept(self, request, token: str, status: str):
+            """
+            Endpoint to accept or decline an invitation using a unique token.
+            """
+            if status not in ["accepted", "declined"]:
+                return 404, {"message": "Invalid status. Choose 'accepted' or 'declined'."}
 
-    @route.put('/decline/{id}', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
-    def decline(self, request, id: int):
-        """
-        Recusa um convite, atualizando o status para 'declined'.
-        """
-        user_enterprise = self.repository.get(id=id)
-        if user_enterprise.status != 'pending':
-            return {"message": "Convite já foi aceito ou recusado."}, 400
-        user_enterprise.status = 'declined'
-        user_enterprise.save()
-        return {
-            "ue_id": user_enterprise.ue_id,
-            "user_id": user_enterprise.user.id,
-            "username": user_enterprise.user.username,
-            "enterprise_id": user_enterprise.enterprise.enterprise_id,
-            "enterprise_name": user_enterprise.enterprise.name,
-            "role": user_enterprise.role,
-            "status": user_enterprise.status,
-        }
+            try:
+                invitation = UserEnterprise.objects.get(token=token)
+            except UserEnterprise.DoesNotExist:
+                raise Http404("Invitation not found.")
+
+            if invitation.status != "pending":
+                return 404, {"message": "Invitation has already been handled."}
+
+            invitation.status = status
+            if status == "accepted":
+                invitation.accept_at = datetime.now()
+            invitation.save()
+
+            return {
+                "ue_id": invitation.ue_id,
+                "user_id": invitation.user.id,
+                "username": invitation.user.username,
+                "enterprise_id": invitation.enterprise.enterprise_id,
+                "enterprise_name": invitation.enterprise.name,
+                "role": invitation.role,
+                "status": invitation.status,
+                "token": invitation.token,
+            }
+
+
+        
 
     @route.delete('/{id}', response={204: None})
     def delete(self, request, id: int):
