@@ -142,6 +142,7 @@ class UserEnterpriseController:
                 "enterprise_id": ue.enterprise.enterprise_id,
                 "enterprise_name": ue.enterprise.name,
                 "role": ue.role,
+                "token": ue.token,
                 "status": ue.status,
             }
             for ue in user_enterprises
