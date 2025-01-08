@@ -56,6 +56,7 @@ class EnterpriseListSchema(Schema):
     boosting: bool
     value_invested: Optional[float] = None
     value_foment: Optional[float] = None
+    file: Optional[str] = Field(None, alias="file", title="Arquivo associado")
 
 # Schema de resposta para erros
 class ErrorResponse(Schema):

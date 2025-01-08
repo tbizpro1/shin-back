@@ -53,7 +53,7 @@ class UserEnterpriseController:
             "status": user_enterprise.status,
         }
 
-    @route.post('', response={200: UserEnterpriseListSchema, 500: ErrorResponse}, auth=None)
+    @route.post('', response={200: UserEnterpriseListSchema, 500: ErrorResponse})
     def post(self, request, payload: UserEnterprisePostSchema):
         """
         Cria uma nova relação UserEnterprise.

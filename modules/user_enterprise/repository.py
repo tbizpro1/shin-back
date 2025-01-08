@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from modules.user_enterprise.models import UserEnterprise
 from modules.user.models import User
 from modules.enterprise.models import Enterprise
+from typing import Any, Dict, Optional, Tuple, List, Union
 
 
 class UserEnterpriseRepository:
@@ -16,10 +17,7 @@ class UserEnterpriseRepository:
 
     @classmethod
     def list(cls) -> models.QuerySet:
-        """
-        Retorna todas as relações UserEnterprise ordenadas por ID.
-        """
-        return cls.model.objects.all().order_by("ue_id")
+        return cls.model.objects.all()
 
     @classmethod
     def get(cls, *, id: int) -> models.Model:
