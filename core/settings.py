@@ -2,7 +2,8 @@ from pathlib import Path
 import environ
 import os
 
-ENVIRONMENT = os.getenv('DJANGO_ENV', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENV', 'production
+                        ')
 print(f"ENVIRONMENT: {ENVIRONMENT}")
 
 env = environ.Env(

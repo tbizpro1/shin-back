@@ -10,6 +10,18 @@ from modules.user_enterprise.schemas import (
 from datetime import datetime
 from django.http import Http404
 from modules.user_enterprise.models import UserEnterprise
+from ninja import Schema
+from typing import List, Optional
+from pydantic import Field
+from ninja import Query
+
+class Filters(Schema):
+    limit: int = 100  
+    offset: Optional[int] = None  
+    username: Optional[str] = None 
+    status: Optional[str] = None  #
+    enterprise_name__in: Optional[List[str]] = Field(None, alias="enterprise_names") 
+
 
 @api_controller(
     '/user-enterprises',
@@ -21,9 +33,33 @@ class UserEnterpriseController:
     repository = UserEnterpriseRepository
 
     @route.get('', response={200: List[UserEnterpriseListSchema]}, auth=None)
-    def list(self, request):
-        
+    def list(self, request, filters: Query[Filters]):
+        # Obtenha todos os dados
         user_enterprises = self.repository.list()
+
+        # Aplique filtros
+        if filters.username:
+            user_enterprises = [
+                ue for ue in user_enterprises if ue.user.username == filters.username
+            ]
+        
+        if filters.status:
+            user_enterprises = [
+                ue for ue in user_enterprises if ue.status == filters.status
+            ]
+
+        if filters.enterprise_name__in:
+            user_enterprises = [
+                ue for ue in user_enterprises if ue.enterprise.name in filters.enterprise_name__in
+            ]
+
+        # Aplicar limite e offset
+        if filters.offset is not None:
+            user_enterprises = user_enterprises[filters.offset:]
+
+        user_enterprises = user_enterprises[:filters.limit]
+
+        # Retorne os dados filtrados
         return [
             {
                 "ue_id": ue.ue_id,
@@ -34,7 +70,6 @@ class UserEnterpriseController:
                 "role": ue.role,
                 "status": ue.status,
                 "token": ue.token,
-
             }
             for ue in user_enterprises
         ]

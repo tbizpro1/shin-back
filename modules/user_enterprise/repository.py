@@ -17,7 +17,7 @@ class UserEnterpriseRepository:
 
     @classmethod
     def list(cls) -> models.QuerySet:
-        return cls.model.objects.all()
+        return cls.model.objects.all().order_by("ue_id")
 
     @classmethod
     def get(cls, *, id: int) -> models.Model:
