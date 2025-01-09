@@ -34,15 +34,59 @@ class UserEnterpriseController:
 
     @route.get('', response={200: List[UserEnterpriseListSchema]}, auth=None)
     def list(self, request, filters: Query[Filters]):
-        # Obtenha todos os dados
+        """
+        Lista as relações UserEnterprise com filtros opcionais.
+
+        ### Como o front deve fazer a requisição:
+        **Endpoint:** `/user-enterprises`
+
+        **Método:** `GET`
+
+        **Parâmetros de Consulta (Query Params):**
+        - `limit` (int, padrão: 100): Número máximo de registros retornados.
+        - `offset` (int, opcional): Número de registros para pular no início.
+        - `username` (str, opcional): Nome de usuário para filtrar.
+        - `status` (str, opcional): Status para filtrar (exemplo: `active`, `pending`).
+        - `enterprise_names` (list[str], opcional): Lista de nomes de empresas para filtrar.
+
+        **Exemplo de Requisição:**
+        ```http
+        GET /user-enterprises?limit=10&offset=5&username=johndoe&status=active&enterprise_names=Google,Microsoft
+        ```
+
+        **Exemplo de Resposta (200):**
+        ```json
+        [
+            {
+                "ue_id": 1,
+                "user_id": 101,
+                "username": "johndoe",
+                "enterprise_id": 201,
+                "enterprise_name": "Google",
+                "role": "admin",
+                "status": "active",
+                "token": "abc123"
+            },
+            {
+                "ue_id": 2,
+                "user_id": 102,
+                "username": "janedoe",
+                "enterprise_id": 202,
+                "enterprise_name": "Microsoft",
+                "role": "editor",
+                "status": "active",
+                "token": "xyz456"
+            }
+        ]
+        ```
+        """
         user_enterprises = self.repository.list()
 
-        # Aplique filtros
         if filters.username:
             user_enterprises = [
                 ue for ue in user_enterprises if ue.user.username == filters.username
             ]
-        
+
         if filters.status:
             user_enterprises = [
                 ue for ue in user_enterprises if ue.status == filters.status
@@ -53,13 +97,11 @@ class UserEnterpriseController:
                 ue for ue in user_enterprises if ue.enterprise.name in filters.enterprise_name__in
             ]
 
-        # Aplicar limite e offset
         if filters.offset is not None:
             user_enterprises = user_enterprises[filters.offset:]
 
         user_enterprises = user_enterprises[:filters.limit]
 
-        # Retorne os dados filtrados
         return [
             {
                 "ue_id": ue.ue_id,
