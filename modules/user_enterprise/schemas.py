@@ -37,7 +37,7 @@ class UserEnterpriseListSchema(Schema):
     status: str = Field(..., alias="status", title="Status do convite")
     send_at: Optional[datetime] = Field(None, alias="send_at", title="Data e hora do envio do convite")
     accept_at: Optional[datetime] = Field(None, alias="accept_at", title="Data e hora do aceite do convite")
-    token: uuid.UUID = Field(..., alias="token", title="Token único")
+    token: uuid.UUID = Field(None, alias="token", title="Token único")
 
 
 class ErrorResponse(Schema):
