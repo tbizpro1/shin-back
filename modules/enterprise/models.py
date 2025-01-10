@@ -1,10 +1,8 @@
 from django.db import models
 
 class Enterprise(models.Model):
-    # Primary Key
     enterprise_id = models.AutoField(primary_key=True)
 
-    # Strings
     name = models.CharField(max_length=255)
     problem = models.TextField()
     solution = models.TextField()

@@ -5,7 +5,7 @@ from django.db import transaction, IntegrityError
 from django.http import Http404
 from ninja_extra import status
 from .repository import EnterpriseRepository
-
+from ..user_enterprise.repository import UserEnterpriseRepository
 class EnterpriseServices:
     """
     Serviços para operações no modelo Enterprise.
