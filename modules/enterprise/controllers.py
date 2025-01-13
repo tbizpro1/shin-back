@@ -35,7 +35,7 @@ class EnterpriseController:
         """
         return self.services.get(id=id)
 
-    @route.post('', response={201: EnterpriseListSchema, 500: ErrorResponse}, auth=None)
+    @route.post('', response={201: EnterpriseListSchema, 500: ErrorResponse})
     def post(
         self, 
         request, 
@@ -45,6 +45,17 @@ class EnterpriseController:
         """
         Cria uma nova empresa.
         """
+        # Aqui o request.user já contém o objeto User. Para pegar o ID, basta acessar .id
+        user_id = request.user.id
+        
+        print(f"esse é o user_id {user_id}")
+        
+        # Adiciona o user_id ao payload
+        payload["user"] = user_id
+        
+        print(f"esse é o payload {payload}")
+        
+        # Chama o serviço para processar a criação
         return self.services.post(payload=payload.dict(), file=file)
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
@@ -52,7 +63,6 @@ class EnterpriseController:
         """
         Atualiza os dados de uma empresa existente.
         """
-        print(f"esse é o payload enterprise {payload}")
         return self.services.put(id=id, payload=payload.dict())
 
     @route.delete('/{id}', response={204: None})

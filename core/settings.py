@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 import environ
 import os
@@ -48,6 +49,22 @@ THIRD_PARTY_APPS = [
 
 
 ]
+
+NINJA_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=18),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "TOKEN_OBTAIN_PAIR_INPUT_SCHEMA": "ninja_jwt.schema.TokenObtainPairInputSchema",
+}
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
+#     'ROTATE_REFRESH_TOKENS': False,                
+#     'BLACKLIST_AFTER_ROTATION': True,            
+#     'ALGORITHM': 'HS256',                         
+#     'VERIFYING_KEY': None,                         
+#     'AUTH_HEADER_TYPES': ('Bearer',),              
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+# }
 
 LOCAL_APPS= [
     'core',

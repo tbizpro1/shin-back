@@ -38,8 +38,18 @@ class UsersController:
     def delete(self, request, id: int):
         return self.services.delete(id=id)
     
-    @route.put('picture/{id}', response={201: UserListSchema, 404: ErrorResponse, 500: ErrorResponse})
+    @route.post('picture/{id}', response={201: UserListSchema, 404: ErrorResponse, 500: ErrorResponse})
     def put_picture(self, request, id: int, profile_picture: UploadedFile = File(...)):
+        print("essa é a file", profile_picture)
+
+        print(f"reqeust: {request}")
         return self.services.put_picture(id=id, file=profile_picture)
+
+    @route.post("/users/picture/")
+    def test_upload(self, request, file: UploadedFile = File(...)):
+        print("Arquivo recebido:", file)
+        if file:
+            print("Nome do arquivo:", file.name)
+        return {"status": "sucesso"}
 
     

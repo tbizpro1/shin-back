@@ -19,6 +19,10 @@ class Repository:
     @classmethod
     def get(cls, *, id: int) -> models.Model:
         return get_object_or_404(cls.model, id=id)
+    
+    @classmethod
+    def filter_by_name(cls, name: str):
+        return cls.model.objects.filter(name__icontains=name).values_list('id', flat=True)
 
 
     @classmethod

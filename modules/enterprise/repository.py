@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from ninja import UploadedFile, File
 from core import settings
 from modules.enterprise.models import Enterprise
-
+from ..user_enterprise.repository import UserEnterpriseRepository
 
 class EnterpriseRepository:
     """
@@ -14,7 +14,7 @@ class EnterpriseRepository:
     """
 
     model = Enterprise
-
+    model_user_enterprise = UserEnterpriseRepository
     @classmethod
     def list(cls) -> models.QuerySet:
         """
@@ -65,8 +65,15 @@ class EnterpriseRepository:
                     f.write(chunk)
             payload["file"] = os.path.join("enterprise_files", file_name)
 
+    # class UserEnterprisePostSchema(Schema):
+    # user_id: int = Field(..., alias="user_id", title="ID do usuário")
+    # enterprise_id: int = Field(..., alias="enterprise_id", title="ID da empresa")
+    # role: RoleEnum = Field(..., alias="role", title="Papel do usuário na empresa")
+
         payload = cls.update_payload(payload=payload)
-        return cls.model.objects.create(**payload)
+        enterprise = cls.model.objects.create(**payload)
+        
+        return enterprise
 
     @classmethod
     def put(cls, *, id: int, payload: Dict, **kwargs) -> models.Model:

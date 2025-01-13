@@ -67,7 +67,6 @@ class Services:
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
         try:
             with transaction.atomic():
-                print(f"esse é o payload {payload}")
 
                 # Validação do payload
                 status_code, message_or_object = cls.validate_payload(payload=payload, id=id)
