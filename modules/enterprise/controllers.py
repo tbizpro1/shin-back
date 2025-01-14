@@ -7,6 +7,7 @@ from modules.enterprise.schemas import (
     EnterprisePutSchema,
     ErrorResponse,
 )
+from modules.user_enterprise.repository import UserEnterpriseRepository
 from typing import List
 from ninja import Form, File, UploadedFile
 
@@ -26,7 +27,6 @@ class EnterpriseController:
         """
         Retorna a lista de empresas cadastradas.
         """
-        return self.services.list()
 
     @route.get('/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse})
     def get(self, request, id: int):
@@ -43,20 +43,28 @@ class EnterpriseController:
         file: UploadedFile = File(None)
     ):
         """
-        Cria uma nova empresa.
+        Cria uma nova empresa e associa o usuário a ela.
         """
-        # Aqui o request.user já contém o objeto User. Para pegar o ID, basta acessar .id
         user_id = request.user.id
+
+        status_code, created_enterprise = self.services.post(payload=payload.dict(), file=file)
+        print(f"Empresa criada: {created_enterprise.enterprise_id}")
+        enterprise_id = created_enterprise.enterprise_id
+
+        UserEnterpriseRepository.post(
+            payload={
+                'user_id': user_id,
+                'enterprise_id': enterprise_id,
+                'role': 'owner',
+                'status': 'accepted',
+            }
+        )
         
-        print(f"esse é o user_id {user_id}")
-        
-        # Adiciona o user_id ao payload
-        payload["user"] = user_id
-        
-        print(f"esse é o payload {payload}")
-        
-        # Chama o serviço para processar a criação
-        return self.services.post(payload=payload.dict(), file=file)
+        print(f"Usuário {user_id} associado à empresa {enterprise_id}")
+        print(f"Payload recebido: {payload.dict()}")
+
+        return 201, created_enterprise
+
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: EnterprisePutSchema):
