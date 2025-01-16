@@ -3,6 +3,8 @@ from typing import Dict, Optional
 from core import settings
 from ninja import UploadedFile, File
 from modules.user.models import User
+from cloudinary.uploader import upload
+from cloudinary.utils import cloudinary_url
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -55,21 +57,16 @@ class Repository:
     def post(cls, *, payload: Dict, file: Optional[UploadedFile] = File(None), **kwargs) -> models.Model:
         
         if file:
-            upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_pictures')
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-
-            file_name = f"{file.name}"
-
-            file_path = os.path.join(upload_dir, file_name)
-
-            with open(file_path, 'wb+') as f:
-                for chunk in file.chunks():
-                    f.write(chunk)
-            payload["profile_picture"] = os.path.join('profile_pictures', file_name)
-        
+            try:
+                upload_response = upload(file, folder="profile_pictures/")
+                file_url = upload_response.get("secure_url")
+                payload["profile_picture"] = file_url
+            except Exception as e:
+                print(f"Erro ao fazer upload para o Cloudinary: {e}")
+                raise e
         
         payload = cls.update_payload(payload=payload)
+        print(f"Payload atualizado: {payload}") 
         return cls.model.objects.create(**payload)
     
     @classmethod
@@ -102,26 +99,26 @@ class Repository:
     
     @classmethod
     def put_picture(
-        cls,
-        *,
-        id: int,
-        file: UploadedFile,
-        **kwargs
-    ) -> models.Model:
-        
-        instance = cls.get(id=id)
-        
-        upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_pictures')
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
+            cls,
+            *,
+            id: int,
+            file: UploadedFile,
+            **kwargs
+        ) -> models.Model:
+            
+            instance = cls.get(id=id)
+            
+            upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_pictures')
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
 
-        file_name = f"{file.name}"
+            file_name = f"{file.name}"
 
-        file_path = os.path.join(upload_dir, file_name)
+            file_path = os.path.join(upload_dir, file_name)
 
-        with open(file_path, 'wb+') as f:
-            for chunk in file.chunks():
-                f.write(chunk)
-        instance.profile_picture = os.path.join('profile_pictures', file_name)
-        instance.save()
-        return instance
+            with open(file_path, 'wb+') as f:
+                for chunk in file.chunks():
+                    f.write(chunk)
+            instance.profile_picture = os.path.join('profile_pictures', file_name)
+            instance.save()
+            return instance

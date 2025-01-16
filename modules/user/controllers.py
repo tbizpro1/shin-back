@@ -26,9 +26,16 @@ class UsersController:
     
     @route.post('', response={201: UserListSchema, 500: ErrorResponse}, auth=None)
     def post(self, request, payload: UserPostSchema = Form(...), profile_picture: UploadedFile = File(None)):
-        
-        return self.services.post(payload=payload.dict(), file=profile_picture)
-    
+        # Converter o payload para dicionário
+        schema_dict = payload.dict()
+
+        # Iterar sobre os itens do dicionário
+        for key, value in schema_dict.items():
+            if isinstance(value, str) and len(value) > 100:
+                print(f"Campo {key} tem {len(value)} caracteres: {value}")
+
+    # Passar o dicionário para o serviço
+        return self.services.post(payload=schema_dict, file=profile_picture)
     @route.put('/{id}', response={200: UserListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: UserPutSchema):
         print(f"Payload recebido no controlador: {payload.dict()}")

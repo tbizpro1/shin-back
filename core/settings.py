@@ -2,6 +2,26 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 import os
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
+
+cloudinary.config(
+    cloud_name="deblo2eaz", 
+    api_key="734137955877121",  
+    api_secret="qpv3-P1hEpKWdiyDuI3wUu4jaEI" 
+)
+
+MEDIA_URL = '/media/'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'deblo2eaz',
+    'API_KEY': '734137955877121',
+    'API_SECRET': "qpv3-P1hEpKWdiyDuI3wUu4jaEI",
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 ENVIRONMENT = os.getenv('DJANGO_ENV', 'production')
 print(f"ENVIRONMENT: {ENVIRONMENT}")
@@ -46,8 +66,8 @@ THIRD_PARTY_APPS = [
     'ninja_jwt',
     'django_extensions', 
     'corsheaders',
-
-
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 NINJA_JWT = {

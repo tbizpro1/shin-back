@@ -19,7 +19,7 @@ class User(AbstractUser):
     last_login = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='user', null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = models.URLField(max_length=255)
     
     REQUIRED_FIELDS = ['password', 'username']
     USERNAME_FIELD = 'email'
