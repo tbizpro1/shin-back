@@ -99,26 +99,22 @@ class Repository:
     
     @classmethod
     def put_picture(
-            cls,
-            *,
-            id: int,
-            file: UploadedFile,
-            **kwargs
-        ) -> models.Model:
-            
-            instance = cls.get(id=id)
-            
-            upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_pictures')
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
+        cls,
+        *,
+        id: int,
+        file: UploadedFile,
+        **kwargs
+    ) -> models.Model:
+        instance = cls.get(id=id)
 
-            file_name = f"{file.name}"
+        try:
+            upload_response = upload(file, folder="profile_pictures/")
+            file_url = upload_response.get("secure_url")
+            instance.profile_picture = file_url  # Atualizar o campo profile_picture com a URL gerada
+        except Exception as e:
+            print(f"Erro ao fazer upload para o Cloudinary: {e}")
+            raise e
 
-            file_path = os.path.join(upload_dir, file_name)
+        instance.save()
 
-            with open(file_path, 'wb+') as f:
-                for chunk in file.chunks():
-                    f.write(chunk)
-            instance.profile_picture = os.path.join('profile_pictures', file_name)
-            instance.save()
-            return instance
+        return instance
