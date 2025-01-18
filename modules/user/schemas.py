@@ -12,6 +12,7 @@ class RoleFilterEnum(str, Enum):
 class GenderEnum(str, Enum):
     m = "Male"
     f = "Female"
+    n = "Prefer not to say"
 
 
 class UserPostSchema(Schema):
@@ -33,9 +34,10 @@ class UserPostSchema(Schema):
     date_of_birth: Optional[datetime] = None
     country: Optional[str] = None
     cep: Optional[str] = None
-    street: Optional[str] = None
-    neighborhood: Optional[str] = None
-    number: Optional[str] = None
+    # street: Optional[str] = None
+    # neighborhood: Optional[str] = None
+    # number: Optional[str] = None
+    cpf: Optional[str] = None
 
 
 class UserPutSchema(Schema):
@@ -57,9 +59,11 @@ class UserPutSchema(Schema):
     date_of_birth: Optional[datetime] = None
     country: Optional[str] = None
     cep: Optional[str] = None
-    street: Optional[str] = None
-    neighborhood: Optional[str] = None
-    number: Optional[str] = None
+    # street: Optional[str] = None
+    # neighborhood: Optional[str] = None
+    # number: Optional[str] = None
+    cpf: Optional[str] = None
+
 
 class UserListSchema(Schema):
     id: int
@@ -84,9 +88,10 @@ class UserListSchema(Schema):
     last_login: datetime
     is_active: bool
     cep: Optional[str] = None
-    street: Optional[str] = None
-    neighborhood: Optional[str] = None
-    number: Optional[str] = None
+    # street: Optional[str] = None
+    # neighborhood: Optional[str] = None
+    # number: Optional[str] = None
+    cpf: Optional[str] = None
 
 
 # Schema de resposta para registro
@@ -109,9 +114,10 @@ class RegisterSchema(Schema):
     date_of_birth: Optional[datetime] = None
     country: Optional[str] = None
     cep: Optional[str] = None
-    street: Optional[str] = None
-    neighborhood: Optional[str] = None
-    number: Optional[str] = None
+    # street: Optional[str] = None
+    # neighborhood: Optional[str] = None
+    # number: Optional[str] = None
+    cpf: Optional[str] = None
 
 
 class RegisterResponseSchema(Schema):
@@ -132,9 +138,10 @@ class RegisterResponseSchema(Schema):
     date_of_birth: Optional[datetime] = None
     country: Optional[str] = None
     cep: Optional[str] = None
-    street: Optional[str] = None
-    neighborhood: Optional[str] = None
-    number: Optional[str] = None
+    # street: Optional[str] = None
+    # neighborhood: Optional[str] = None
+    # number: Optional[str] = None
+    cpf: Optional[str] = None
 
 
 class ErrorResponse(Schema):

@@ -8,8 +8,9 @@ class User(AbstractUser):
     )
     
     GENDER_CHOICES = (
-        ('m', 'Male'),
-        ('f', 'Female'),
+    ('m', 'Male'),
+    ('f', 'Female'),
+    ('n', 'Prefer not to say'),
     )
 
     id = models.AutoField(primary_key=True)
@@ -35,9 +36,10 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
     cep = models.CharField(max_length=20, null=True, blank=True)
-    street = models.CharField(max_length=255, null=True, blank=True)
-    neighborhood = models.CharField(max_length=255, null=True, blank=True)
-    number = models.CharField(max_length=10, null=True, blank=True)
+    # street = models.CharField(max_length=255, null=True, blank=True)
+    # neighborhood = models.CharField(max_length=255, null=True, blank=True)
+    # number = models.CharField(max_length=10, null=True, blank=True)
+    cpf = models.CharField(max_length=14, unique=True, null=True, blank=True)  # Novo campo CPF
 
     REQUIRED_FIELDS = ['username', 'password']
     USERNAME_FIELD = 'email'
