@@ -23,7 +23,7 @@ class UserPostSchema(Schema):
     profession: Optional[str] = None
     role: RoleFilterEnum
     state: Optional[str] = None
-    gender: Optional[GenderEnum] = None
+    gender: GenderEnum = None
     institution: Optional[str] = None
     education_level: Optional[str] = None
     ethnicity: Optional[str] = None
