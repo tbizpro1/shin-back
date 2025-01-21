@@ -14,6 +14,7 @@ from ninja import Schema
 from typing import List, Optional
 from pydantic import Field
 from ninja import Query
+from ..logs.services import LogService
 
 class Filters(Schema):
     limit: int = 100  
@@ -29,10 +30,11 @@ class Filters(Schema):
 )
 class UserEnterpriseController:
   
+    log_service = LogService()  # Instância do LogService
 
     repository = UserEnterpriseRepository
 
-    @route.get('', response={200: List[UserEnterpriseListSchema]}, auth=None)
+    @route.get('', response={200: List[UserEnterpriseListSchema]})
     def list(self, request, filters: Query[Filters]):
         """
         Lista as relações UserEnterprise com filtros opcionais.
@@ -136,6 +138,11 @@ class UserEnterpriseController:
         Cria uma nova relação UserEnterprise.
         """
         user_enterprise = self.repository.post(payload=payload.dict())
+        self.log_service.create_log(
+            user_id=user_enterprise.user.id, 
+            change_type="post", 
+            description=f'Você foi convidado para participar da {user_enterprise.enterprise.name}.'
+        )
         return {
             "ue_id": user_enterprise.ue_id,
             "user_id": user_enterprise.user.id,
@@ -144,6 +151,8 @@ class UserEnterpriseController:
             "enterprise_name": user_enterprise.enterprise.name,
             "role": user_enterprise.role,
             "status": user_enterprise.status,
+            "token": user_enterprise.token,
+
         }
 
     @route.put('/{id}', response={200: UserEnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
@@ -162,11 +171,12 @@ class UserEnterpriseController:
             "status": user_enterprise.status,
         }
 
-    @route.put('/invitation/{token}/', response={200: UserEnterpriseListSchema, 404: ErrorResponse}, auth=None)
+    @route.put('/invitation/{token}/', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
     def accept(self, request, token: str, status: str):
             """
             Endpoint to accept or decline an invitation using a unique token.
             """
+            print(f'esse é o user id: {request.user}')
             if status not in ["accepted", "declined"]:
                 return 404, {"message": "Invalid status. Choose 'accepted' or 'declined'."}
 
@@ -180,6 +190,13 @@ class UserEnterpriseController:
 
             invitation.status = status
             if status == "accepted":
+                user_id = request.user.id
+
+                self.log_service.create_log(
+                user_id=user_id, 
+                change_type="post", 
+                description=f'Você aceitou o convite de uma empresa.'
+                 )
                 invitation.accept_at = datetime.now()
             invitation.save()
 
@@ -205,7 +222,7 @@ class UserEnterpriseController:
         self.repository.delete(id=id)
         return None
 
-    @route.get('/user/{user_id}', response={200: List[UserEnterpriseListSchema]}, auth=None)
+    @route.get('/user/{user_id}', response={200: List[UserEnterpriseListSchema]})
     def list_by_user(self, request, user_id: int):
         """
         Retorna todas as relações UserEnterprise associadas a um usuário específico.
@@ -225,7 +242,7 @@ class UserEnterpriseController:
             for ue in user_enterprises
         ]
 
-    @route.get('/enterprise/{enterprise_id}', response={200: List[UserEnterpriseListSchema]}, auth=None)
+    @route.get('/enterprise/{enterprise_id}', response={200: List[UserEnterpriseListSchema]})
     def list_by_enterprise(self, request, enterprise_id: int):
         """
         Retorna todas as relações UserEnterprise associadas a uma empresa específica.

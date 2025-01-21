@@ -16,7 +16,7 @@ api = NinjaExtraAPI(
     description="Nossa API",
     app_name="shin",
     auth=JWTAuth(),
-    urls_namespace="shin-api-v1",  # Evita conflitos
+    urls_namespace="shin-api-v1",  
     docs=Swagger(
         settings={
             'docExpansion': 'none',

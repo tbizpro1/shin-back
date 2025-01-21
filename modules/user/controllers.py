@@ -16,7 +16,7 @@ class UsersController:
     
     services = Services
     
-    @route.get('', response={200: List[UserListSchema]}, auth=None)
+    @route.get('', response={200: List[UserListSchema]})
     def list(self, request):
         return self.services.list()
     
