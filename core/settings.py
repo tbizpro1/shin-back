@@ -93,6 +93,7 @@ LOCAL_APPS= [
     'modules.enterprise',
     'modules.user_enterprise',
     'modules.activity_history',
+    'modules.logs',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

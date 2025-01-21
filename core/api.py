@@ -8,7 +8,7 @@ from modules.enterprise.controllers import EnterpriseController
 from modules.user_enterprise.controllers import UserEnterpriseController
 from modules.user.controllers import UsersController
 from modules.token.controllers import TokenController
-
+from modules.logs.controllers import LogController
 
 api = NinjaExtraAPI(
     title="Shin API V1",
@@ -33,6 +33,9 @@ api = NinjaExtraAPI(
 
 # User Controllers
 api.register_controllers(UsersController)
+
+# Log Controllers
+api.register_controllers(LogController)
 
 # Core Controllers
 api.register_controllers(TokenController)

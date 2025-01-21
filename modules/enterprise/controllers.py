@@ -10,6 +10,8 @@ from modules.enterprise.schemas import (
 from modules.user_enterprise.repository import UserEnterpriseRepository
 from typing import List
 from ninja import Form, File, UploadedFile
+from ..logs.services import LogService
+
 
 @api_controller(
     '/enterprises',
@@ -21,19 +23,37 @@ class EnterpriseController:
     """
 
     services = EnterpriseServices
+    log_service = LogService()  # Instância do LogService
 
-    @route.get('', response={200: List[EnterpriseListSchema]}, auth=None)
+    @route.get('', response={200: List[EnterpriseListSchema]})
     def list(self, request):
         """
         Retorna a lista de empresas cadastradas.
         """
+        user_id = request.user.id
+        print('user_id', user_id)
+        result = self.services.list()
+        self.log_service.create_log(
+            user_id=user_id, 
+            change_type="read", 
+            description="Você listou todas as empresas cadastras no sistema."
+        )
+        return result
 
     @route.get('/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse})
     def get(self, request, id: int):
         """
         Retorna os detalhes de uma empresa pelo ID.
         """
-        return self.services.get(id=id)
+        user_id = request.user.id
+        result = self.services.get(id=id)
+        self.log_service.create_log(
+            user_id=user_id, 
+            change_type="read", 
+            description="Você visualizou os detalhes de uma empresa."
+        )
+
+        return result
 
     @route.post('', response={201: EnterpriseListSchema, 500: ErrorResponse})
     def post(
@@ -46,9 +66,7 @@ class EnterpriseController:
         Cria uma nova empresa e associa o usuário a ela.
         """
         user_id = request.user.id
-
         status_code, created_enterprise = self.services.post(payload=payload.dict(), file=file)
-        print(f"Empresa criada: {created_enterprise.enterprise_id}")
         enterprise_id = created_enterprise.enterprise_id
 
         UserEnterpriseRepository.post(
@@ -59,30 +77,52 @@ class EnterpriseController:
                 'status': 'accepted',
             }
         )
-        
-        print(f"Usuário {user_id} associado à empresa {enterprise_id}")
-        print(f"Payload recebido: {payload.dict()}")
 
+        self.log_service.create_log(
+            user_id=user_id, 
+            change_type="create", 
+            description="Você criou uma nova empresa."
+        )
         return 201, created_enterprise
-
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: EnterprisePutSchema):
         """
         Atualiza os dados de uma empresa existente.
         """
-        return self.services.put(id=id, payload=payload.dict())
+        user_id = request.user.id
+        updated_enterprise = self.services.put(id=id, payload=payload.dict())
+        self.log_service.create_log(
+            user_id=user_id, 
+            change_type="update", 
+            description="Você atualizou os dados de uma empresa."
+        )
+        return updated_enterprise
 
     @route.delete('/{id}', response={204: None})
     def delete(self, request, id: int):
         """
         Deleta uma empresa pelo ID.
         """
-        return self.services.delete(id=id)
+        user_id = request.user.id
+        self.services.delete(id=id)
+        self.log_service.create_log(
+            user_id=user_id, 
+            change_type="delete", 
+            description="Você deletou uma empresa."
+        )
+        return 204, None
 
-    @route.put('file/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse, 500: ErrorResponse})
+    @route.post('file/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse, 500: ErrorResponse})
     def upload_file(self, request, id: int, file: UploadedFile = File(...)):
         """
         Atualiza o arquivo associado à empresa.
         """
-        return self.services.upload_file(id=id, file=file)
+        user_id = request.user.id
+        updated_file = self.services.upload_file(id=id, file=file)
+        self.log_service.create_log(
+           user_id=user_id, 
+            change_type="update", 
+            description="Você atualizou a foto de uma empresa."
+        )
+        return updated_file

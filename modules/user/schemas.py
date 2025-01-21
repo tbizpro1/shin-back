@@ -10,9 +10,9 @@ class RoleFilterEnum(str, Enum):
 
 
 class GenderEnum(str, Enum):
-    m = "Male"
-    f = "Female"
-    n = "Prefer not to say"
+    m = "m"
+    f = "f"
+    n = "p"
 
 
 class UserPostSchema(Schema):
