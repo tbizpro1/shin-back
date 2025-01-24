@@ -3,6 +3,8 @@ from typing import Optional
 from ninja import Schema, Field
 from datetime import datetime
 from pydantic import validator
+from datetime import datetime, date
+
 from ..utils.validator_cpf import validar_cpf
 class RoleFilterEnum(str, Enum):
     admin = "admin"
@@ -93,6 +95,7 @@ class UserListSchema(Schema):
     country: Optional[str] = None
     date_joined: datetime
     last_login: datetime
+    age: Optional[int] = None  
     is_active: bool
     cep: Optional[str] = None
     # street: Optional[str] = None
@@ -100,6 +103,17 @@ class UserListSchema(Schema):
     # number: Optional[str] = None
     cpf: Optional[str] = None
 
+    @validator("age", pre=True, always=True)
+    def calcular_idade(cls, _, values):
+        date_of_birth = values.get("date_of_birth")
+        if date_of_birth:
+            today = date.today()
+            return (
+                today.year
+                - date_of_birth.year
+                - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+            )
+        return None
 
 # Schema de resposta para registro
 class RegisterSchema(Schema):
