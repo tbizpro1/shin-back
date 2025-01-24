@@ -2,8 +2,8 @@ from enum import Enum
 from typing import Optional
 from ninja import Schema, Field
 from datetime import datetime
-
-
+from pydantic import validator
+from ..utils.validator_cpf import validar_cpf
 class RoleFilterEnum(str, Enum):
     admin = "admin"
     user = "user"
@@ -38,6 +38,13 @@ class UserPostSchema(Schema):
     # neighborhood: Optional[str] = None
     # number: Optional[str] = None
     cpf: Optional[str] = None
+
+
+    @validator("cpf")
+    def validar_cpf(cls, cpf):
+        if not validar_cpf(cpf):
+            raise ValueError("CPF inválido")
+        return cpf
 
 
 class UserPutSchema(Schema):

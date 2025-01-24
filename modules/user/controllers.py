@@ -26,7 +26,57 @@ class UsersController:
     
     @route.post('', response={201: UserListSchema, 500: ErrorResponse}, auth=None)
     def post(self, request, payload: UserPostSchema = Form(...), profile_picture: UploadedFile = File(None)):
-        # Converter o payload para dicionário
+        """
+        Criação de usuários.
+        Essa rota permite a criação de usuários com dados pessoais e profissionais.
+
+        - **username**: Nome de usuário.
+        - **email**: Endereço de e-mail.
+        - **password**: Senha do usuário.
+        - **phone**: (Opcional) Telefone de contato.
+        - **linkedin**: (Opcional) Perfil do LinkedIn.
+        - **profession**: (Opcional) Profissão do usuário.
+        - **role**: Função do usuário (admin ou usuário regular).
+        - **state**: (Opcional) Estado de residência.
+        - **gender**: (Opcional) Gênero do usuário.
+        - **institution**: (Opcional) Instituição de trabalho ou estudo.
+        - **education_level**: (Opcional) Nível de educação.
+        - **ethnicity**: (Opcional) Etnia.
+        - **city**: (Opcional) Cidade de residência.
+        - **whatsapp_number**: (Opcional) Número do WhatsApp.
+        - **weekly_hours_worked**: (Opcional) Horas semanais de trabalho.
+        - **date_of_birth**: (Opcional) Data de nascimento.
+        - **country**: (Opcional) País de residência.
+        - **cep**: (Opcional) Código postal.
+        - **cpf**: (Opcional) CPF do usuário.
+
+        Arquivo opcional:
+        - **file**: Um arquivo opcional que pode ser associado ao usuário.
+        {
+        "username": "johndoe",
+        "email": "johndoe@example.com",
+        "password": "StrongPassword123",
+        "phone": "+5511998765432",
+        "linkedin": "https://www.linkedin.com/in/johndoe",
+        "profession": "Software Engineer",
+        "role": "user",
+        "state": "São Paulo",
+        "gender": "male",
+        "institution": "Universidade de São Paulo",
+        "education_level": "Mestrado",
+        "ethnicity": "Branco",
+        "city": "São Paulo",
+        "whatsapp_number": "+5511998765432",
+        "weekly_hours_worked": 40,
+        "date_of_birth": "1990-01-15",
+        "country": "Brasil",
+        "cep": "01001-000",
+        "cpf": "123.456.789-09"
+        }
+        Retornos:
+        - **201**: Usuário criado com sucesso.
+        - **400**: Erro de validação no payload.
+        """
         schema_dict = payload.dict()
 
         # Iterar sobre os itens do dicionário
