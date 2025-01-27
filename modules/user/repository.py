@@ -95,7 +95,12 @@ class Repository:
         ) -> models.Model:
         instance.delete()
         return instance
-    
+    @classmethod
+    def get(cls, *, id: int) -> models.Model:
+        """
+        Retorna um user pelo ID ou lança um erro 404.
+        """
+        return get_object_or_404(cls.model, id=id)
     
     @classmethod
     def put_picture(

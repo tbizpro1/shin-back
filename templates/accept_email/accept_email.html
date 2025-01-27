@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Convite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .accept {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .accept:hover {
+            background-color: #218838;
+        }
+        .decline {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .decline:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerenciar Convite</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+            {% endif %}
+            {% if success_message %}
+            <div class="success">{{ success_message }}</div>
+            {% endif %}
+
+            <label for="enterprise_name">Empresa</label>
+            <input type="text" id="enterprise_name" name="enterprise_name" value="{{ enterprise_name }}" readonly>
+
+            <div class="buttons">
+                <button type="submit" name="action" value="accepted" class="accept">Aceitar</button>
+                <button type="submit" name="action" value="declined" class="decline">Recusar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

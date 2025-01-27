@@ -17,6 +17,7 @@ class UserEnterprisePostSchema(Schema):
     user_id: int = Field(..., alias="user_id", title="ID do usuário")
     enterprise_id: int = Field(..., alias="enterprise_id", title="ID da empresa")
     role: RoleEnum = Field(..., alias="role", title="Papel do usuário na empresa")
+    
 
 class UserEnterprisePutSchema(Schema):
     user_id: Optional[int] = Field(None, alias="user_id", title="ID do usuário")

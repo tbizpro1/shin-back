@@ -4,14 +4,22 @@ import environ
 import os
 import cloudinary
 import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
 
-
+from django.urls import reverse
 cloudinary.config(
     cloud_name="deblo2eaz", 
     api_key="734137955877121",  
     api_secret="qpv3-P1hEpKWdiyDuI3wUu4jaEI" 
 )
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True  
+EMAIL_HOST_USER = 'brenoramon55@gmail.com'  # Seu e-mail
+EMAIL_HOST_PASSWORD = 'cddo zkke jwlu jnrr'  # (criar senha de app no gmail)
+EMAIL_USE_SSL = False
+
 
 MEDIA_URL = '/media/'
 
@@ -121,7 +129,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Adicione diretórios de templates personalizados se necessário
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # Adicione diretórios de templates personalizados se necessário
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

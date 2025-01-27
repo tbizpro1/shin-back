@@ -9,12 +9,12 @@ class Enterprise(models.Model):
     value_proposition = models.TextField()
     differential = models.TextField()
     competitors = models.TextField()
-    product = models.CharField(max_length=255)
+    product = models.CharField(max_length=500)
     description = models.TextField()
-    mail = models.EmailField(max_length=255, null=True, blank=True)
-    linkedin = models.URLField(max_length=255, null=True, blank=True)
-    name_foment = models.CharField(max_length=255, null=True, blank=True)
-    programm = models.CharField(max_length=255, null=True, blank=True)
+    mail = models.EmailField(max_length=500, null=True, blank=True)
+    linkedin = models.URLField(max_length=500, null=True, blank=True)
+    name_foment = models.CharField(max_length=500, null=True, blank=True)
+    programm = models.CharField(max_length=500, null=True, blank=True)
     file = models.ImageField(upload_to='enterprise_files/', null=True, blank=True)
 
     # Booleans
