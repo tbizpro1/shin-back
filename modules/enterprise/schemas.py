@@ -51,9 +51,18 @@ class EnterprisePutSchema(Schema):
 class EnterpriseListSchema(Schema):
     enterprise_id: int
     name: str
+    problem: str
+    solution: str
     value_proposition: str
-    invested: bool
-    boosting: bool
+    differential: str
+    competitors: str
+    product: str
+    description: str
+    mail: Optional[EmailStr] = None
+    name_foment: Optional[str] = None
+    programm: Optional[str] = None
+    invested: Optional[bool] = False
+    boosting: Optional[bool] = False
     value_invested: Optional[float] = None
     value_foment: Optional[float] = None
     file: Optional[str] = Field(None, alias="file", title="Arquivo associado")
