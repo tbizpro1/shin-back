@@ -4,7 +4,7 @@ from django.db import models
 from django.shortcuts import get_object_or_404
 from ninja import UploadedFile, File
 from core import settings
-from modules.enterprise.models import Enterprise
+from modules.enterprise.models import Enterprise,CompanyMetrics
 from ..user_enterprise.repository import UserEnterpriseRepository
 
 class EnterpriseRepository:
@@ -118,3 +118,19 @@ class EnterpriseRepository:
         instance.file = os.path.join("enterprise_files", file_name)
         instance.save()
         return instance
+
+
+class CompanyMetricsRepository:
+    """
+    Repositório para a modelagem de Enterprise.
+    Gerencia operações CRUD no banco de dados.
+    """
+
+    model = CompanyMetrics
+
+    @classmethod
+    def list(cls)-> models.QuerySet:
+        """
+        Retorna todas as empresas ordenadas por ID.
+        """
+        return cls.model.objects.all()

@@ -1,15 +1,19 @@
 from modules.enterprise.models import Enterprise
 from ninja_extra import api_controller, route
-from modules.enterprise.services import EnterpriseServices
+from modules.enterprise.services import EnterpriseServices,CompanyMetricsServices
 from modules.enterprise.schemas import (
     EnterpriseListSchema,
     EnterprisePostSchema,
     EnterprisePutSchema,
     ErrorResponse,
+    CompanyMetricsFilterSchema,
+    CompanyMetricsListSchema,
+    CompanyMetricsGetSchema
 )
+import requests
 from modules.user_enterprise.repository import UserEnterpriseRepository
 from typing import List
-from ninja import Form, File, UploadedFile
+from ninja import Form, File, UploadedFile,Query
 from ..logs.services import LogService
 
 
@@ -126,3 +130,36 @@ class EnterpriseController:
             description="Você atualizou a foto de uma empresa."
         )
         return updated_file
+
+    @route.get('tokenrd/')
+    def checkToken(self, request):
+        """
+        Atualiza o arquivo associado à empresa.
+        """
+        url = "https://crm.rdstation.com/api/v1/token/check?token=6762e9a8ccd3ee001af5dc23"
+        headers = {"accept": "application/json"}
+
+        response = requests.get(url, headers=headers)
+
+        print(f"resposta{response.text}resposta")
+        
+@api_controller(
+    '/company-metrics',
+    tags=['Rota - Metricas Economicas da Empresa'],
+)
+class CompanyMetricsController:
+    """
+    Controller para gerenciar operações relacionadas ao modelo Enterprise.
+    """
+
+    services = CompanyMetricsServices
+   # Instância do LogService
+
+    @route.get('/', response={200:List[CompanyMetricsGetSchema]},)
+    def list(self, request,filters: CompanyMetricsFilterSchema = Query(...)):
+        """
+
+        """
+        queryset = self.services.list(filters=filters.dict(exclude_none=True))
+        return list(queryset)
+        

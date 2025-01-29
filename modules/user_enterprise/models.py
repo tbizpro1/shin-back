@@ -34,6 +34,12 @@ class UserEnterprise(models.Model):
         blank=True, 
         verbose_name="Invitation Accepted At"
     )
+    percentage = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        verbose_name="Porcentagem do sócio na empresa",
+        default=0.00
+    )
 
     class Meta:
         verbose_name = "User Enterprise"

@@ -24,7 +24,7 @@ class UsersController:
     def get(self, request, id: int):
         return self.services.get(id=id)
     
-    @route.post('', response={201: UserListSchema, 500: ErrorResponse}, auth=None)
+    @route.post('', response={201: UserListSchema, 500: ErrorResponse})
     def post(self, request, payload: UserPostSchema = Form(...), profile_picture: UploadedFile = File(None)):
         """
         Criação de usuários.

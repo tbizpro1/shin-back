@@ -4,7 +4,8 @@ from django.db import models
 from django.db import transaction, IntegrityError
 from django.http import Http404
 from ninja_extra import status
-from .repository import EnterpriseRepository
+from .repository import EnterpriseRepository,CompanyMetricsRepository
+
 class EnterpriseServices:
     """
     Serviços para operações no modelo Enterprise.
@@ -116,3 +117,18 @@ class EnterpriseServices:
                 return status.HTTP_200_OK, instance
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+
+
+class CompanyMetricsServices:
+    """
+    Serviços para operações no modelo Company Metrics.
+    """
+
+    repository = CompanyMetricsRepository
+
+    @classmethod
+    def list(cls, *, filters: Optional[Any] = None) -> models.QuerySet:
+        queryset = cls.repository.list()
+        if filters:
+            queryset = queryset.filter(**filters)
+        return queryset
