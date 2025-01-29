@@ -6,6 +6,7 @@ from ninja import UploadedFile, File
 from core import settings
 from modules.enterprise.models import Enterprise,CompanyMetrics
 from ..user_enterprise.repository import UserEnterpriseRepository
+from cloudinary.uploader import upload
 
 class EnterpriseRepository:
     """
@@ -27,7 +28,9 @@ class EnterpriseRepository:
         """
         Retorna uma empresa específica pelo ID ou lança um erro 404.
         """
-        return get_object_or_404(cls.model, enterprise_id=id)
+        object = get_object_or_404(cls.model, enterprise_id=id)
+      
+        return object
 
     @classmethod
     def update_payload(cls, *, payload: Dict, **kwargs) -> Dict:
@@ -45,36 +48,31 @@ class EnterpriseRepository:
 
         return payload
 
+
     @classmethod
     def post(
-        cls, *, payload: Dict, file: Optional[UploadedFile] = File(None), **kwargs
+        cls, *, payload: Dict, file: Optional[UploadedFile] = None, **kwargs
     ) -> models.Model:
         """
         Cria um novo registro de empresa no banco de dados.
         """
         if file:
-            upload_dir = os.path.join(settings.MEDIA_ROOT, "enterprise_files")
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-
-            file_name = f"{file.name}"
-            file_path = os.path.join(upload_dir, file_name)
-
-            with open(file_path, "wb+") as f:
-                for chunk in file.chunks():
-                    f.write(chunk)
-            payload["file"] = os.path.join("enterprise_files", file_name)
-
-    # class UserEnterprisePostSchema(Schema):
-    # user_id: int = Field(..., alias="user_id", title="ID do usuário")
-    # enterprise_id: int = Field(..., alias="enterprise_id", title="ID da empresa")
-    # role: RoleEnum = Field(..., alias="role", title="Papel do usuário na empresa")
-
+            try:
+                upload_response = upload(file, folder="enterprises_pictures/")
+                file_url = upload_response.get("secure_url")
+                payload["profile_picture"] = file_url
+            except Exception as e:
+                print(f"Erro ao fazer upload para o Cloudinary: {e}")
+                raise e
+        
+        # Atualiza payload antes da criação
         payload = cls.update_payload(payload=payload)
+        
+        # Cria a instância do modelo no banco de dados
         enterprise = cls.model.objects.create(**payload)
         
         return enterprise
-
+    
     @classmethod
     def put(cls, *, id: int, payload: Dict, **kwargs) -> models.Model:
         """

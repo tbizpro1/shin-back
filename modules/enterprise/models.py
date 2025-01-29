@@ -27,10 +27,11 @@ class Enterprise(models.Model):
 
     # Strategy and Competitiveness
     value_proposition = models.TextField(help_text="Explique de forma breve os benefícios que sua startup oferece")
-    competitive_differential = models.TextField(help_text="Descreva o benefício único oferecido ao cliente")
+    competitive_differential = models.TextField(help_text="Descreva o benefício único oferecido ao cliente", default="Não especificado")
     competitors = models.TextField(help_text="Conte quem são seus principais competidores ou substitutivos")
     business_model = models.CharField(max_length=255, null=True, blank=True, help_text="Selecione o modelo de negócio")
     revenue_model = models.CharField(max_length=255, null=True, blank=True, help_text="Selecione o modelo de receita")
+    differential = models.TextField(null=True, blank=True, help_text="Diferencial competitivo da startup")
 
     # Investment Information
     invested = models.BooleanField(default=False, help_text="Informe se já recebeu investimento")
@@ -45,8 +46,7 @@ class Enterprise(models.Model):
     file = models.ImageField(upload_to='enterprise_files/', null=True, blank=True, help_text="Envie um arquivo relacionado à startup")
     discovered_startup = models.CharField(max_length=255, null=True, blank=True, help_text="Onde conheceu o Programa Startup Piauí")
     other_projects = models.TextField(null=True, blank=True, help_text="Informe outros projetos do Programa Startup Piauí que você participa")
-
-
+    profile_picture = models.URLField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.value_proposition[:30]}..."

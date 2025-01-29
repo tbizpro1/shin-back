@@ -5,7 +5,8 @@ from django.db import transaction, IntegrityError
 from django.http import Http404
 from ninja_extra import status
 from .repository import EnterpriseRepository,CompanyMetricsRepository
-
+from .schemas import EnterpriseListSchema
+from .models import Enterprise
 class EnterpriseServices:
     """
     Serviços para operações no modelo Enterprise.
@@ -25,22 +26,105 @@ class EnterpriseServices:
         return status.HTTP_200_OK, instance
 
     @classmethod
-    def list(cls, *, filters: Optional[Any] = None) -> models.QuerySet:
+    def list(cls, *, filters: Optional[Any] = None) -> List[EnterpriseListSchema]:
         """
         Retorna a lista de empresas com filtros opcionais.
         """
         queryset = cls.repository.list()
         if filters:
             queryset = queryset.filter(**filters)
-        return queryset
+
+        # Converter o QuerySet para uma lista de `EnterpriseListSchema`
+        enterprise_list = [
+            EnterpriseListSchema(
+                enterprise_id=enterprise.enterprise_id,
+                name=enterprise.name,
+                email=enterprise.email,
+                linkedin=enterprise.linkedin,
+                instagram=enterprise.instagram,
+                whatsapp=enterprise.whatsapp,
+                website=enterprise.website,
+                summary=enterprise.summary,
+                cnpj=enterprise.cnpj,
+                foundation_year=enterprise.foundation_year,
+                city=enterprise.city,
+                state=enterprise.state,
+                market=enterprise.market,
+                segment=enterprise.segment,
+                problem=enterprise.problem,
+                solution=enterprise.solution,
+                differential=enterprise.differential,
+                client_type=enterprise.client_type,
+                product=enterprise.product,
+                product_stage=enterprise.product_stage,
+                value_proposition=enterprise.value_proposition,
+                competitors=enterprise.competitors,
+                business_model=enterprise.business_model,
+                revenue_model=enterprise.revenue_model,
+                invested=enterprise.invested,
+                investment_value=enterprise.investment_value,
+                boosting=enterprise.boosting,
+                funding_value=enterprise.funding_value,
+                funding_program=enterprise.funding_program,
+                accelerated=enterprise.accelerated,
+                accelerator_name=enterprise.accelerator_name,
+                discovered_startup=enterprise.discovered_startup,
+                other_projects=enterprise.other_projects,
+            )
+            for enterprise in queryset
+        ]
+
+        return enterprise_list
     
     @classmethod
-    def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
+    def get(cls, *, id: int) -> Tuple[int, Dict[str, Any]]:
         """
         Retorna uma empresa pelo ID ou lança erro.
         """
         try:
-            return status.HTTP_200_OK, cls.repository.get(id=id)
+            instance: Enterprise = cls.repository.get(id=id)
+            print("🔥 Instance ORM:", instance)  # Mostra a representação do objeto no Django ORM
+            print("🔥 Instance as dict:", instance.__dict__)
+            # ✅ Converter `instance` para `EnterpriseListSchema`
+            enterprise_response = EnterpriseListSchema(
+                enterprise_id=instance.enterprise_id,
+                name=instance.name,
+                email=instance.email,
+                linkedin=instance.linkedin,
+                instagram=instance.instagram,
+                whatsapp=instance.whatsapp,
+                website=instance.website,
+                summary=instance.summary,
+                cnpj=instance.cnpj,
+                foundation_year=instance.foundation_year,
+                city=instance.city,
+                state=instance.state,
+                market=instance.market,
+                segment=instance.segment,
+                problem=instance.problem,
+                solution=instance.solution,
+                differential=instance.differential or "",  # ✅ Garante string válida
+                client_type=instance.client_type,
+                product=instance.product,
+                product_stage=instance.product_stage,
+                value_proposition=instance.value_proposition,
+                competitors=instance.competitors,
+                business_model=instance.business_model,
+                revenue_model=instance.revenue_model,
+                invested=instance.invested,
+                investment_value=instance.investment_value,
+                boosting=instance.boosting,
+                funding_value=instance.funding_value,
+                funding_program=instance.funding_program,
+                accelerated=instance.accelerated,
+                accelerator_name=instance.accelerator_name,
+                discovered_startup=instance.discovered_startup,
+                other_projects=instance.other_projects,
+                profile_picture=instance.profile_picture
+            )
+
+            return status.HTTP_200_OK, enterprise_response.model_dump()  # ✅ Retorna dicionário compatível
+
         except Http404:
             return status.HTTP_404_NOT_FOUND, {"message": "Enterprise not found"}
 
@@ -66,7 +150,7 @@ class EnterpriseServices:
     @classmethod
     def put(
         cls, *, id: int, payload: Dict[str, Any], **kwargs
-    ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
+    ) -> Tuple[int, Union[EnterpriseListSchema, Dict[str, str]]]:
         """
         Atualiza os dados de uma empresa.
         """
@@ -77,8 +161,47 @@ class EnterpriseServices:
                 if status_code != status.HTTP_200_OK:
                     return status_code, message_or_object
                 
-                instance: models.Model = cls.repository.put(id=id, payload=payload)
-                return status.HTTP_200_OK, instance
+                instance: Enterprise = cls.repository.put(id=id, payload=payload)
+
+                # ✅ Converter `instance` para `EnterpriseListSchema`
+                enterprise_response = EnterpriseListSchema(
+                    enterprise_id=instance.enterprise_id,
+                    name=instance.name,
+                    email=instance.email,
+                    linkedin=instance.linkedin,
+                    instagram=instance.instagram,
+                    whatsapp=instance.whatsapp,
+                    website=instance.website,
+                    summary=instance.summary,
+                    cnpj=instance.cnpj,
+                    foundation_year=instance.foundation_year,
+                    city=instance.city,
+                    state=instance.state,
+                    market=instance.market,
+                    segment=instance.segment,
+                    problem=instance.problem,
+                    solution=instance.solution,
+                    differential=instance.differential or "",  # ✅ Garante string válida
+                    client_type=instance.client_type,
+                    product=instance.product,
+                    product_stage=instance.product_stage,
+                    value_proposition=instance.value_proposition,
+                    competitors=instance.competitors,
+                    business_model=instance.business_model,
+                    revenue_model=instance.revenue_model,
+                    invested=instance.invested,
+                    investment_value=instance.investment_value,
+                    boosting=instance.boosting,
+                    funding_value=instance.funding_value,
+                    funding_program=instance.funding_program,
+                    accelerated=instance.accelerated,
+                    accelerator_name=instance.accelerator_name,
+                    discovered_startup=instance.discovered_startup,
+                    other_projects=instance.other_projects,
+                )
+
+                return status.HTTP_200_OK, enterprise_response  # ✅ Retorna o schema correto
+
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
 
@@ -103,7 +226,7 @@ class EnterpriseServices:
     @classmethod
     def upload_file(
         cls, *, id: int, file: UploadedFile, **kwargs
-    ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
+    ) -> Tuple[int, Dict[str, Any]]:
         """
         Atualiza o arquivo associado a uma empresa.
         """
@@ -113,11 +236,50 @@ class EnterpriseServices:
                 if status_code != status.HTTP_200_OK:
                     return status_code, message_or_object
                 
-                instance: models.Model = cls.repository.upload_file(id=id, file=file)
-                return status.HTTP_200_OK, instance
+                instance: Enterprise = cls.repository.upload_file(id=id, file=file)
+
+                # ✅ Converter `instance` para `EnterpriseListSchema`
+                enterprise_response = EnterpriseListSchema(
+                    enterprise_id=instance.enterprise_id,
+                    name=instance.name,
+                    email=instance.email,
+                    linkedin=instance.linkedin,
+                    instagram=instance.instagram,
+                    whatsapp=instance.whatsapp,
+                    website=instance.website,
+                    summary=instance.summary,
+                    cnpj=instance.cnpj,
+                    foundation_year=instance.foundation_year,
+                    city=instance.city,
+                    state=instance.state,
+                    market=instance.market,
+                    segment=instance.segment,
+                    problem=instance.problem,
+                    solution=instance.solution,
+                    differential=instance.differential or "",  # ✅ Evita erro de `None`
+                    client_type=instance.client_type,
+                    product=instance.product,
+                    product_stage=instance.product_stage,
+                    value_proposition=instance.value_proposition,
+                    competitors=instance.competitors,
+                    business_model=instance.business_model,
+                    revenue_model=instance.revenue_model,
+                    invested=instance.invested,
+                    investment_value=instance.investment_value,
+                    boosting=instance.boosting,
+                    funding_value=instance.funding_value,
+                    funding_program=instance.funding_program,
+                    accelerated=instance.accelerated,
+                    accelerator_name=instance.accelerator_name,
+                    discovered_startup=instance.discovered_startup,
+                    other_projects=instance.other_projects,
+                    profile_picture=instance.profile_picture
+                )
+
+                return status.HTTP_200_OK, enterprise_response.model_dump()  # ✅ Retorna um dicionário compatível
+
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
-
 
 class CompanyMetricsServices:
     """

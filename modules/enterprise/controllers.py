@@ -36,13 +36,57 @@ class EnterpriseController:
         """
         user_id = request.user.id
         print('user_id', user_id)
+
         result = self.services.list()
+
         self.log_service.create_log(
             user_id=user_id, 
             change_type="read", 
-            description="Você listou todas as empresas cadastras no sistema."
+            description="Você listou todas as empresas cadastradas no sistema."
         )
-        return result
+
+        # Converter QuerySet para lista de dicionários compatíveis com Django Ninja
+        enterprise_list = [
+            EnterpriseListSchema(
+                enterprise_id=enterprise.enterprise_id,
+                name=enterprise.name,
+                email=enterprise.email,
+                linkedin=enterprise.linkedin,
+                instagram=enterprise.instagram,
+                whatsapp=enterprise.whatsapp,
+                website=enterprise.website,
+                summary=enterprise.summary,
+                cnpj=enterprise.cnpj,
+                foundation_year=enterprise.foundation_year,
+                city=enterprise.city,
+                state=enterprise.state,
+                market=enterprise.market,
+                segment=enterprise.segment,
+                problem=enterprise.problem,
+                solution=enterprise.solution,
+                differential=enterprise.differential,
+                client_type=enterprise.client_type,
+                product=enterprise.product,
+                product_stage=enterprise.product_stage,
+                value_proposition=enterprise.value_proposition,
+                competitors=enterprise.competitors,
+                business_model=enterprise.business_model,
+                revenue_model=enterprise.revenue_model,
+                invested=enterprise.invested,
+                investment_value=enterprise.investment_value,
+                boosting=enterprise.boosting,
+                funding_value=enterprise.funding_value,
+                funding_program=enterprise.funding_program,
+                accelerated=enterprise.accelerated,
+                accelerator_name=enterprise.accelerator_name,
+                discovered_startup=enterprise.discovered_startup,
+                other_projects=enterprise.other_projects,
+                profile_picture=enterprise.profile_picture
+            ).model_dump()  # Converte para dicionário
+            for enterprise in result
+        ]
+
+        return enterprise_list
 
     @route.get('/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse})
     def get(self, request, id: int):
@@ -87,7 +131,45 @@ class EnterpriseController:
             change_type="create", 
             description="Você criou uma nova empresa."
         )
-        return 201, created_enterprise
+
+        # **Converter `created_enterprise` para `EnterpriseListSchema`**
+        enterprise_response = EnterpriseListSchema(
+            enterprise_id=created_enterprise.enterprise_id,
+            name=created_enterprise.name,
+            email=created_enterprise.email,
+            linkedin=created_enterprise.linkedin,
+            instagram=created_enterprise.instagram,
+            whatsapp=created_enterprise.whatsapp,
+            website=created_enterprise.website,
+            summary=created_enterprise.summary,
+            cnpj=created_enterprise.cnpj,
+            foundation_year=created_enterprise.foundation_year,
+            city=created_enterprise.city,
+            state=created_enterprise.state,
+            market=created_enterprise.market,
+            segment=created_enterprise.segment,
+            problem=created_enterprise.problem,
+            solution=created_enterprise.solution,
+            differential=created_enterprise.differential,
+            client_type=created_enterprise.client_type,
+            product=created_enterprise.product,
+            product_stage=created_enterprise.product_stage,
+            value_proposition=created_enterprise.value_proposition,
+            competitors=created_enterprise.competitors,
+            business_model=created_enterprise.business_model,
+            revenue_model=created_enterprise.revenue_model,
+            invested=created_enterprise.invested,
+            investment_value=created_enterprise.investment_value,
+            boosting=created_enterprise.boosting,
+            funding_value=created_enterprise.funding_value,
+            funding_program=created_enterprise.funding_program,
+            accelerated=created_enterprise.accelerated,
+            accelerator_name=created_enterprise.accelerator_name,
+            discovered_startup=created_enterprise.discovered_startup,
+            other_projects=created_enterprise.other_projects,
+        )
+
+        return 201, enterprise_response 
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: EnterprisePutSchema):

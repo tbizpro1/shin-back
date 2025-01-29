@@ -13,10 +13,10 @@ class InvestedFilterEnum(str, Enum):
 class EnterprisePostSchema(BaseModel):
     name: str
     email: Optional[EmailStr] = Field(None, title="Email")
-    linkedin: Optional[HttpUrl] = Field(None, title="LinkedIn")
-    instagram: Optional[HttpUrl] = Field(None, title="Instagram")
+    linkedin: Optional[str] = Field(None, title="LinkedIn")
+    instagram: Optional[str] = Field(None, title="Instagram")
     whatsapp: Optional[str] = Field(None, title="WhatsApp")
-    website: Optional[HttpUrl] = Field(None, title="Website")
+    website: Optional[str] = Field(None, title="Website")
     summary: Optional[str] = Field(None, title="Resumo")
     cnpj: Optional[str] = Field(None, title="CNPJ")
     foundation_year: Optional[int] = Field(None, title="Ano de Fundação")
@@ -24,10 +24,11 @@ class EnterprisePostSchema(BaseModel):
     state: Optional[str] = Field(None, title="Estado")
     market: Optional[str] = Field(None, title="Mercado")
     segment: Optional[str] = Field(None, title="Segmento Inicial de Atuação")
-    problem: str
-    solution: str
+    problem: Optional[str]
+    differential: Optional[str]
+    solution: Optional[str]
     client_type: Optional[str] = Field(None, title="Tipo de Cliente da Solução")
-    product: str
+    product: Optional[str]
     product_stage: Optional[str] = Field(None, title="Estágio de Maturidade do Produto")
     value_proposition: str
     differential: str
@@ -48,10 +49,10 @@ class EnterprisePostSchema(BaseModel):
 class EnterprisePutSchema(BaseModel):
     name: Optional[str] = Field(None, alias="name", title="Nome da empresa")
     email: Optional[EmailStr] = Field(None, alias="email", title="Email")
-    linkedin: Optional[HttpUrl] = Field(None, alias="linkedin", title="LinkedIn")
-    instagram: Optional[HttpUrl] = Field(None, alias="instagram", title="Instagram")
+    linkedin: Optional[str] = Field(None, alias="linkedin", title="LinkedIn")
+    instagram: Optional[str] = Field(None, alias="instagram", title="Instagram")
     whatsapp: Optional[str] = Field(None, alias="whatsapp", title="WhatsApp")
-    website: Optional[HttpUrl] = Field(None, alias="website", title="Website")
+    website: Optional[str] = Field(None, alias="website", title="Website")
     summary: Optional[str] = Field(None, alias="summary", title="Resumo")
     cnpj: Optional[str] = Field(None, alias="cnpj", title="CNPJ")
     foundation_year: Optional[int] = Field(None, alias="foundation_year", title="Ano de Fundação")
@@ -84,10 +85,10 @@ class EnterpriseListSchema(BaseModel):
     enterprise_id: int
     name: str
     email: Optional[EmailStr] = None
-    linkedin: Optional[HttpUrl] = None
-    instagram: Optional[HttpUrl] = None
+    linkedin: Optional[str] = None
+    instagram: Optional[str] = None
     whatsapp: Optional[str] = None
-    website: Optional[HttpUrl] = None
+    website: Optional[str] = None
     summary: Optional[str] = None
     cnpj: Optional[str] = None
     foundation_year: Optional[int] = None
@@ -95,14 +96,15 @@ class EnterpriseListSchema(BaseModel):
     state: Optional[str] = None
     market: Optional[str] = None
     segment: Optional[str] = None
-    problem: str
-    solution: str
+    problem: Optional[str] = None
+    solution: Optional[str] = None
+    differential: Optional[str] = None
     client_type: Optional[str] = None
-    product: str
+    product: Optional[str] = None
     product_stage: Optional[str] = None
-    value_proposition: str
-    differential: str
-    competitors: str
+    value_proposition: Optional[str] = None
+    differential: Optional[str] = None
+    competitors: Optional[str] = None
     business_model: Optional[str] = None
     revenue_model: Optional[str] = None
     invested: Optional[bool] = False
@@ -114,6 +116,7 @@ class EnterpriseListSchema(BaseModel):
     accelerator_name: Optional[str] = None
     discovered_startup: Optional[str] = None
     other_projects: Optional[str] = None
+    profile_picture: Optional[str] = None
     
 class CompanyMetricsPostSchema(Schema):
     enterprise: int =  Field(None, alias="enterprise", title="ID da empresa")
