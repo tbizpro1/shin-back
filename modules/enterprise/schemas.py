@@ -131,7 +131,8 @@ class CompanyMetricsPostSchema(Schema):
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
 
 class CompanyMetricsGetSchema(Schema):
-    enterprise: int =  Field(None, alias="enterprise", title="ID da empresa")
+    id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
+    enterprise: int =  Field(None, alias="enterprise_id", title="ID da empresa")
     team_size:int = Field(None, alias="team_size", title="Tamanho do time")
     revenue_period: float = Field(None, alias="revenue_period", title="periodo de revenda")
     total_clients:int = Field(None, alias="total_clients", title="total de clientes")
@@ -141,9 +142,16 @@ class CompanyMetricsGetSchema(Schema):
     value_invested:float = Field(None, alias="value_invested", title="Valor investido")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)")
+    class Config:
+        # Isso garante que ao fazer a conversão com from_orm, ele consiga mapear o valor correto
+        orm_mode = True
+
 
 class CompanyMetricsListSchema(Schema):
     enterprises_metrics: List[CompanyMetricsGetSchema]
+
+    class Config:
+        orm_mode = True
 
 class CompanyMetricsPutSchema(Schema):
     team_size: Optional[int]  = Field(None, alias="team_size", title="Tamanho do time")

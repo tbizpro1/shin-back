@@ -53,7 +53,7 @@ class Enterprise(models.Model):
 
 class CompanyMetrics(models.Model):
     enterprise = models.ForeignKey(Enterprise, on_delete=models.CASCADE, related_name="metrics", help_text="Empresa associada às métricas")
-    date_recorded = models.DateField(help_text="Data de registro das métricas")
+    date_recorded = models.DateField(auto_now_add=True, help_text="Data de registro das métricas")
     team_size = models.IntegerField(help_text="Tamanho do time que não são sócios")
     revenue_period = models.DecimalField(max_digits=12, decimal_places=2, help_text="Receita durante o período")
     total_clients = models.IntegerField(help_text="Número total de clientes durante o período")
@@ -66,6 +66,7 @@ class CompanyMetrics(models.Model):
         null=True, 
         help_text="Necessidade de capital caso a rodada esteja aberta"
     )
+    
     value_invested = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     value_foment = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     valuation = models.CharField(
@@ -74,4 +75,4 @@ class CompanyMetrics(models.Model):
     )
 
     def __str__(self):
-        return f"Métricas de {self.enterprise.name} - {self.date_recorded}"
+        return f"Métricas de {self.enterprise.name}"

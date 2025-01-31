@@ -132,3 +132,40 @@ class CompanyMetricsRepository:
         Retorna todas as empresas ordenadas por ID.
         """
         return cls.model.objects.all()
+    
+    @classmethod
+    def company_metrics_by_id(cls,*,id:int) -> models.Model:
+        """
+        Busca um registro pelo id
+        """
+        return get_object_or_404(cls.model,id=id)
+    
+    @classmethod
+    def create_company_metrics(cls, *, payload: Dict) -> models.Model:
+        response = cls.model.objects.create(**payload)
+        print("no repositoru",response)
+        return response
+    @classmethod
+    def update_company_metrics(cls, *, id: int, payload: Dict) -> models.Model:
+        """
+        Atualiza uma CompanyMetrics existente com os dados fornecidos.
+        """
+        # Busca o objeto existente
+        company_metrics = get_object_or_404(cls.model, id=id)
+        
+        # Atualiza os campos
+        for field, value in payload.items():
+            setattr(company_metrics, field, value)
+        
+        # Salva as mudanças
+        company_metrics.save()
+        
+        return company_metrics
+
+    @classmethod
+    def delete(cls, *, id: int, **kwargs) -> None:
+        """
+        Deleta uma empresa pelo ID.
+        """
+        instance = cls.get(id=id)
+        instance.delete()

@@ -8,6 +8,7 @@ from modules.enterprise.schemas import (
     ErrorResponse,
     CompanyMetricsFilterSchema,
     CompanyMetricsListSchema,
+    CompanyMetricsPostSchema,
     CompanyMetricsGetSchema
 )
 import requests
@@ -15,6 +16,7 @@ from modules.user_enterprise.repository import UserEnterpriseRepository
 from typing import List
 from ninja import Form, File, UploadedFile,Query
 from ..logs.services import LogService
+from django.http import JsonResponse
 
 
 @api_controller(
@@ -29,7 +31,7 @@ class EnterpriseController:
     services = EnterpriseServices
     log_service = LogService()  # Instância do LogService
 
-    @route.get('', response={200: List[EnterpriseListSchema]})
+    @route.get('', response={200: List[EnterpriseListSchema], 400: ErrorResponse, 500: ErrorResponse})
     def list(self, request):
         """
         Retorna a lista de empresas cadastradas.
@@ -237,11 +239,46 @@ class CompanyMetricsController:
     services = CompanyMetricsServices
    # Instância do LogService
 
-    @route.get('/', response={200:List[CompanyMetricsGetSchema]},)
-    def list(self, request,filters: CompanyMetricsFilterSchema = Query(...)):
+    @route.get("/", response={200: List[CompanyMetricsGetSchema]})
+    def list(self, request, filters: CompanyMetricsFilterSchema = Query(...)):
         """
-
+        Endpoint para listar os dados de métricas de empresas.
         """
+        # Obtendo os dados com base nos filtros
         queryset = self.services.list(filters=filters.dict(exclude_none=True))
-        return list(queryset)
+        print("no controller",queryset,"acabou no contorller")
+        return queryset
         
+        @route.get("/{company_metric_id}", response=CompanyMetricsGetSchema)
+        def get_by_id(self,request, company_metric_id: int):
+            response = CompanyMetricsServices.company_metrics_by_id(id=company_metric_id)
+            if not response:
+                return {"error": "register not found"}
+            return response
+    
+    @route.post("/", response={200:CompanyMetricsGetSchema,201:CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def create( self, 
+        request, 
+        payload: CompanyMetricsPostSchema = Form(...)):
+        response = CompanyMetricsServices.create(payload=payload)
+        print("respostaa",response)
+        if not response:
+            return {"error": "register not found"}
+        return response
+
+    @route.put("/{company_metric_id}", response={200: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def update(request, company_metric_id: int, payload: CompanyMetricsPostSchema):
+        """
+        Atualiza uma CompanyMetrics existente.
+        """
+        response, status_code = CompanyMetricsServices.update(id=company_metric_id, payload=payload.dict())
+        return JsonResponse(response, status=status_code)
+
+    @route.delete('/{company_metric_id}', response={204: None})
+    def delete(self,company_metric_id: int):
+        """
+        Exclui uma CompanyMetrics pelo ID.
+        """
+        self.services.delete(id=id)
+        
+        return 204,None
