@@ -132,7 +132,45 @@ class EnterpriseServices:
     @classmethod
     def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
         try:
-            return status.HTTP_200_OK, cls.repository.get(id=id)
+            object_dict = cls.repository.get(id=id).__dict__
+            return status.HTTP_200_OK, {
+        "enterprise_id": object_dict["enterprise_id"],
+        "name": object_dict["name"],
+        "email": object_dict.get("email"),
+        "linkedin": object_dict.get("linkedin"),
+        "instagram": object_dict.get("instagram"),
+        "whatsapp": object_dict.get("whatsapp"),
+        "website": object_dict.get("website"),
+        "summary": object_dict.get("summary"),
+        "cnpj": object_dict.get("cnpj"),
+        "foundation_year": object_dict.get("foundation_year"),
+        "city": object_dict.get("city"),
+        "state": object_dict.get("state"),
+        "market": object_dict.get("market"),
+        "segment": object_dict.get("segment"),
+        "problem": object_dict.get("problem"),
+        "solution": object_dict.get("solution"),
+        "differential": object_dict.get("differential"),
+        "client_type": object_dict.get("client_type"),
+        "product": object_dict.get("product"),
+        "product_stage": object_dict.get("product_stage"),
+        "value_proposition": object_dict.get("value_proposition"),
+        "competitors": object_dict.get("competitors"),
+        "business_model": object_dict.get("business_model"),
+        "revenue_model": object_dict.get("revenue_model"),
+        "invested": object_dict.get("invested", False),
+        "investment_value": object_dict.get("investment_value"),
+        "boosting": object_dict.get("boosting", False),
+        "funding_value": object_dict.get("funding_value"),
+        "funding_program": object_dict.get("funding_program"),
+        "accelerated": object_dict.get("accelerated", False),
+        "accelerator_name": object_dict.get("accelerator_name"),
+        "discovered_startup": object_dict.get("discovered_startup"),
+        "other_projects": object_dict.get("other_projects"),
+        "profile_picture": object_dict.get("profile_picture"),
+        "initial_maturity": object_dict.get("initial_maturity"),
+    }
+        
         except Http404:
             return status.HTTP_404_NOT_FOUND, {"message": (
                 f"{cls.repository.model._meta.verbose_name.capitalize()} not found"
@@ -250,7 +288,7 @@ class EnterpriseServices:
                     return status_code, message_or_object
                 
                 instance: Enterprise = cls.repository.put_picture(id=id, file=file)
-
+                print(f"instance: {instance}")
                 # ✅ Converter `instance` para `EnterpriseListSchema`
                 enterprise_response = EnterpriseListSchema(
                     enterprise_id=instance.enterprise_id,
