@@ -6,8 +6,8 @@
     <title>Gerenciar Convite</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             margin: 0;
             padding: 0;
             display: flex;
@@ -17,60 +17,94 @@
         }
         .container {
             background: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
             max-width: 400px;
             width: 100%;
             text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         label {
             font-size: 14px;
             color: #555;
-            margin-bottom: 10px;
             display: block;
+            margin-bottom: 5px;
         }
         input[type="text"] {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             font-size: 14px;
+            background: #f9f9f9;
+            text-align: center;
         }
         .buttons {
             display: flex;
             justify-content: space-between;
             gap: 10px;
+            margin-top: 20px;
         }
         button {
-            padding: 10px;
+            flex: 1;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 16px;
             cursor: pointer;
-            flex: 1;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .accept {
-            background-color: #28a745;
-            color: #fff;
+            background: #28a745;
+            color: white;
         }
         .accept:hover {
-            background-color: #218838;
+            background: #218838;
         }
         .decline {
-            background-color: #dc3545;
-            color: #fff;
+            background: #dc3545;
+            color: white;
         }
         .decline:hover {
-            background-color: #c82333;
+            background: #c82333;
+        }
+        .loading {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
+    <script>
+        function showLoading(button) {
+            button.innerHTML = 'Processando...';
+            let loader = document.createElement('div');
+            loader.classList.add('loading');
+            button.appendChild(loader);
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -78,18 +112,16 @@
         <form method="POST">
             {% csrf_token %}
             {% if error_message %}
-            <div class="error">{{ error_message }}</div>
+            <div class="error" style="color: red; margin-bottom: 10px;">{{ error_message }}</div>
             {% endif %}
             {% if success_message %}
-            <div class="success">{{ success_message }}</div>
+            <div class="success" style="color: green; margin-bottom: 10px;">{{ success_message }}</div>
             {% endif %}
-
             <label for="enterprise_name">Empresa</label>
             <input type="text" id="enterprise_name" name="enterprise_name" value="{{ enterprise_name }}" readonly>
-
             <div class="buttons">
-                <button type="submit" name="action" value="accepted" class="accept">Aceitar</button>
-                <button type="submit" name="action" value="declined" class="decline">Recusar</button>
+                <button type="submit" name="action" value="accepted" class="accept" onclick="showLoading(this)">Aceitar</button>
+                <button type="submit" name="action" value="declined" class="decline" onclick="showLoading(this)">Recusar</button>
             </div>
         </form>
     </div>

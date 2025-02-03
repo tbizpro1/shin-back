@@ -143,40 +143,44 @@ class UserEnterpriseController:
             message="",
             from_email="noreply@shin.com",
             recipient_list=[user_email],
-            html_message=f"""
-            <!DOCTYPE html>
-            <html lang="pt-BR">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Convite para Participar</title>
-                <style>
-                    body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; }}
-                    .email-container {{ max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; }}
-                    .email-header {{ background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; }}
-                    .email-body {{ padding: 20px; color: #333; }}
-                    .email-body a {{ text-decoration: none; background-color: #007bff; color: #fff; padding: 10px 20px; border-radius: 4px; margin-right: 10px; }}
-                    .email-body a.decline {{ background-color: #dc3545; }}
-                </style>
-            </head>
-            <body>
-                <div class="email-container">
-                    <div class="email-header">
-                        <h1>Convite para Participar</h1>
-                    </div>
-                    <div class="email-body">
-                        <p>Olá,</p>
-                        <p>Você foi convidado para participar da <strong>{enterprise_name}</strong>.</p>
-                        <a href="{link_response}" target="_blank">Responder convite</a>
-                        <p>Ou copie o seguinte código e insira no aplicativo:</p>
-                        <p style="font-weight: bold; font-size: 18px;">{token}</p>
-                        <p>Se você não esperava este convite, pode ignorar este e-mail.</p>
-                        <p>Atenciosamente,<br><strong>{enterprise_name}</strong></p>
-                    </div>
-                </div>
-            </body>
-            </html>
-            """
+    html_message=f"""
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Convite para Participar</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; }}
+            .email-container {{ max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; }}
+            .email-header {{ background: linear-gradient(45deg, #007bff, #0056b3); color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }}
+            .email-body {{ padding: 20px; color: #333; }}
+            .email-body a {{ text-decoration: none; background-color: #007bff; color: #fff; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block; }}
+            .email-body a.decline {{ background-color: #dc3545; }}
+            .token {{ font-weight: bold; font-size: 20px; background: #f8f9fa; padding: 10px; border-radius: 4px; display: inline-block; margin: 10px 0; }}
+            .footer {{ text-align: center; padding: 10px; font-size: 14px; color: #666; }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>Convite para Participar</h1>
+            </div>
+            <div class="email-body">
+                <p>Olá,</p>
+                <p>Você foi convidado para participar da <strong>{enterprise_name}</strong>.</p>
+                <a href="{link_response}" target="_blank">Responder convite</a>
+                <p>Ou copie o seguinte código e insira no aplicativo:</p>
+                <p class="token">{token}</p>
+                <p>Se você não esperava este convite, pode ignorar este e-mail.</p>
+            </div>
+            <div class="footer">
+                <p>Atenciosamente,<br><strong>{enterprise_name}</strong></p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
         )
 
         return {
