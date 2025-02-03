@@ -96,25 +96,25 @@ class EnterpriseRepository:
         return instance
 
     @classmethod
-    def upload_file(cls, *, id: int, file: UploadedFile, **kwargs) -> models.Model:
-        """
-        Atualiza o arquivo associado a uma empresa.
-        """
+    def put_picture(
+        cls,
+        *,
+        id: int,
+        file: UploadedFile,
+        **kwargs
+    ) -> models.Model:
         instance = cls.get(id=id)
 
-        upload_dir = os.path.join(settings.MEDIA_ROOT, "enterprise_files")
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
+        try:
+            upload_response = upload(file, folder="enterprise_pictures/")
+            file_url = upload_response.get("secure_url")
+            instance.profile_picture = file_url  # Atualizar o campo profile_picture com a URL gerada
+        except Exception as e:
+            print(f"Erro ao fazer upload para o Cloudinary: {e}")
+            raise e
 
-        file_name = f"{file.name}"
-        file_path = os.path.join(upload_dir, file_name)
-
-        with open(file_path, "wb+") as f:
-            for chunk in file.chunks():
-                f.write(chunk)
-
-        instance.file = os.path.join("enterprise_files", file_name)
         instance.save()
+
         return instance
 
 

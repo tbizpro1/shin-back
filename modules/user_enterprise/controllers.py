@@ -102,6 +102,7 @@ class UserEnterpriseController:
         Retorna os detalhes de uma relação UserEnterprise pelo ID.
         """
         user_enterprise = self.repository.get(id=id)
+        print(f"UserEnterprise: {user_enterprise.__dict__}")
         return {
             "ue_id": user_enterprise.ue_id,
             "user_id": user_enterprise.user.id,
@@ -110,6 +111,10 @@ class UserEnterpriseController:
             "enterprise_name": user_enterprise.enterprise.name,
             "role": user_enterprise.role,
             "status": user_enterprise.status,
+            "token": user_enterprise.token,
+            "send_at": user_enterprise.send_at,
+            "accept_at": user_enterprise.accept_at
+
         }
 
     @route.post('', response={200: UserEnterpriseListSchema, 500: ErrorResponse})
@@ -201,7 +206,7 @@ class UserEnterpriseController:
             "status": user_enterprise.status,
         }
 
-    @route.put('/invitation/{token}/', response={200: UserEnterpriseListSchema, 404: ErrorResponse})
+    @route.put('/invitation/{token}/', response={200: UserEnterprisePutSchema, 404: ErrorResponse})
     def accept(self, request, token: str, status: str):
         """
         Endpoint para aceitar ou recusar um convite utilizando um token único.
@@ -236,8 +241,6 @@ class UserEnterpriseController:
         return {
             "ue_id": invitation.ue_id,
             "user_id": invitation.user.id,
-            "enterprise_id": invitation.enterprise.enterprise_id,
-            "enterprise_name": invitation.enterprise.name,
             "status": invitation.status,
         }
 

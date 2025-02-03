@@ -249,7 +249,7 @@ class EnterpriseServices:
                 if status_code != status.HTTP_200_OK:
                     return status_code, message_or_object
                 
-                instance: Enterprise = cls.repository.upload_file(id=id, file=file)
+                instance: Enterprise = cls.repository.put_picture(id=id, file=file)
 
                 # ✅ Converter `instance` para `EnterpriseListSchema`
                 enterprise_response = EnterpriseListSchema(

@@ -175,6 +175,8 @@ class EnterpriseController:
             accelerator_name=created_enterprise.accelerator_name,
             discovered_startup=created_enterprise.discovered_startup,
             other_projects=created_enterprise.other_projects,
+            profile_picture=created_enterprise.profile_picture,
+            initial_maturity=created_enterprise.initial_maturity
         )
 
         return 201, enterprise_response 
