@@ -3,6 +3,8 @@ from typing import Optional,List
 from ninja import Schema, Field,FilterSchema
 from datetime import datetime
 from pydantic import EmailStr, HttpUrl,BaseModel
+from enum import Enum
+from datetime import date
 
 # Enum para filtrar por estado de investimento
 class InvestedFilterEnum(str, Enum):
@@ -44,6 +46,7 @@ class EnterprisePostSchema(BaseModel):
     accelerator_name: Optional[str] = Field(None, title="Nome da Aceleradora")
     discovered_startup: Optional[str] = Field(None, title="Onde conheceu a Startup Piauí?")
     other_projects: Optional[str] = Field(None, title="Outros Projetos no Startup Piauí")
+    initial_maturity: Optional[str] = Field(None, title="Estágio Inicial")
 
 # Schema para atualização (PUT)
 class EnterprisePutSchema(BaseModel):
@@ -79,7 +82,7 @@ class EnterprisePutSchema(BaseModel):
     accelerator_name: Optional[str] = Field(None, alias="accelerator_name", title="Nome da Aceleradora")
     discovered_startup: Optional[str] = Field(None, alias="discovered_startup", title="Onde conheceu a Startup Piauí?")
     other_projects: Optional[str] = Field(None, alias="other_projects", title="Outros Projetos no Startup Piauí")
-
+    initial_maturity: Optional[str] = Field(None, alias="initial_maturity", title="Estágio Inicial")
 # Schema para listagem (GET)
 class EnterpriseListSchema(BaseModel):
     enterprise_id: int
@@ -117,7 +120,7 @@ class EnterpriseListSchema(BaseModel):
     discovered_startup: Optional[str] = None
     other_projects: Optional[str] = None
     profile_picture: Optional[str] = None
-    
+    initial_maturity: Optional[str] = None
 class CompanyMetricsPostSchema(Schema):
     enterprise: int =  Field(None, alias="enterprise", title="ID da empresa")
     team_size:int = Field(None, alias="team_size", title="Tamanho do time")
@@ -132,7 +135,7 @@ class CompanyMetricsPostSchema(Schema):
 
 class CompanyMetricsGetSchema(Schema):
     id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
-    enterprise: int =  Field(None, alias="enterprise_id", title="ID da empresa")
+    enterprise_id: int =  Field(None, alias="enterprise_id", title="ID da empresa")
     team_size:int = Field(None, alias="team_size", title="Tamanho do time")
     revenue_period: float = Field(None, alias="revenue_period", title="periodo de revenda")
     total_clients:int = Field(None, alias="total_clients", title="total de clientes")
@@ -177,6 +180,91 @@ class CompanyMetricsFilterSchema(FilterSchema):
 
 
 
-# Schema de resposta para erros
+
+class initial_maturityEnum(str, Enum):
+        TRL_0 = 'TRL 0 - Não iniciado'
+        TRL_1 = 'TRL 1 - Princípios básicos observados e documentados'
+        TRL_2 = 'TRL 2 - Formulação do conceito da tecnologia'
+        TRL_3 = 'TRL 3 - Prova de conceito experimental'
+        TRL_4 = 'TRL 4 - Validação do conceito em laboratório'
+        TRL_5 = 'TRL 5 - Validação do conceito em ambiente relevante'
+        TRL_6 = 'TRL 6 - Demonstração em ambiente relevante'
+        TRL_7 = 'TRL 7 - Demonstração em ambiente operacional'
+        TRL_8 = 'TRL 8 - Sistema completo e qualificado'
+        TRL_9 = 'TRL 9 - Sistema comprovado em ambiente operacional'
+    
+class MITPhaseEnum(str, Enum):
+        PHASE_1 = 'Fase 1'
+        PHASE_2 = 'Fase 2'
+        PHASE_3 = 'Fase 3'
+
+class ProductStatusEnum(str, Enum):
+        NOT_STARTED = 'Não Iniciado'
+        IN_DEVELOPMENT = 'Em Desenvolvimento'
+        COMPLETED = 'Finalizado'
+
+class BusinessStatusEnum(str, Enum):
+        LOOKING_FOR_TEAM = 'Procurando Equipe'
+        IDEATION = 'Ideação'
+        MVP = 'MVP'
+        TESTING = 'Primeiros Testes'
+        BETA_PHASE = 'Fase Beta'
+        MONETIZATION = 'Monetização'
+        CLIENT_CREATION = 'Criação de Clientes'
+        BUILDING_COMPANY = 'Construção de Empresa'
+        SCALE_UP = 'Scale Up'
+
+class RecordInSchema(BaseModel):
+    enterprise: int
+    date_collected: date
+    responsible: str = Field(..., min_length=3, max_length=255)
+    data_type: initial_maturityEnum
+    mit_phase: MITPhaseEnum
+    product_status: ProductStatusEnum
+    business_status: BusinessStatusEnum
+    how_we_can_help: Optional[str] = Field(None, max_length=500)
+    next_steps: Optional[str] = Field(None, max_length=500)
+    next_meeting_date: Optional[date] = None
+    observations: Optional[str] = Field(None, max_length=500)
+
+class RecordMinimalSchema(Schema):
+    id: int
+    enterprise: int
+
+class RecordOutSchema(Schema):
+    enterprise: int 
+    id: int
+    date_collected: date
+    responsible: str
+    data_type: initial_maturityEnum
+    mit_phase: MITPhaseEnum
+    product_status: ProductStatusEnum
+    business_status: BusinessStatusEnum
+    how_we_can_help: Optional[str]
+    next_steps: Optional[str]
+    next_meeting_date: Optional[date]
+    observations: Optional[str]
+
 class ErrorResponse(Schema):
     message: str
+
+class RecordFilterSchema(FilterSchema):
+    enterprise: Optional[int] = None
+    date_collected_start: Optional[date] = None
+    date_collected_end: Optional[date] = None
+    mit_phase: Optional[MITPhaseEnum] = None
+    product_status: Optional[ProductStatusEnum] = None
+    business_status: Optional[BusinessStatusEnum] = None
+
+class RecordPutSchema(BaseModel):
+    enterprise: Optional[int] = None
+    date_collected: Optional[date] = None
+    responsible: Optional[str] = Field(None, min_length=3, max_length=255)
+    data_type: Optional[initial_maturityEnum] = None
+    mit_phase: Optional[MITPhaseEnum] = None
+    product_status: Optional[ProductStatusEnum] = None
+    business_status: Optional[BusinessStatusEnum] = None
+    how_we_can_help: Optional[str] = Field(None, max_length=500)
+    next_steps: Optional[str] = Field(None, max_length=500)
+    next_meeting_date: Optional[date] = None
+    observations: Optional[str] = Field(None, max_length=500)

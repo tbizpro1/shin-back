@@ -1,8 +1,8 @@
 from modules.user.models import User
 from ninja_extra import api_controller, route
 from modules.user.services import Services
-from modules.user.schemas import UserListSchema, UserPostSchema, UserPutSchema, ErrorResponse,RegisterSchema, RegisterResponseSchema
-from typing import List
+from modules.user.schemas import UserListSchema, UserPostSchema, UserPutSchema, ErrorResponse, ErrorResponse
+from typing import List, Dict
 from ninja import Form, File, UploadedFile
 from modules.utils.permission.permissions import AdminPermission
 from ninja.errors import HttpError
@@ -24,7 +24,7 @@ class UsersController:
     def get(self, request, id: int):
         return self.services.get(id=id)
     
-    @route.post('', response={201: UserListSchema, 500: ErrorResponse})
+    @route.post('', response={201: UserListSchema, 500: ErrorResponse},auth=None)
     def post(self, request, payload: UserPostSchema = Form(...), profile_picture: UploadedFile = File(None)):
         """
         Criação de usuários.
@@ -91,7 +91,7 @@ class UsersController:
         print(f"Payload recebido no controlador: {payload.dict()}")
         return self.services.put(id=id, payload=payload.dict())
 
-    @route.delete('/{id}', response={204: None})
+    @route.delete('/{id}',  response= {200: Dict[str, str], 404: ErrorResponse, 500: ErrorResponse})
     def delete(self, request, id: int):
         return self.services.delete(id=id)
     
@@ -102,11 +102,5 @@ class UsersController:
         print(f"reqeust: {request}")
         return self.services.put_picture(id=id, file=profile_picture)
 
-    @route.post("/users/picture/")
-    def test_upload(self, request, file: UploadedFile = File(...)):
-        print("Arquivo recebido:", file)
-        if file:
-            print("Nome do arquivo:", file.name)
-        return {"status": "sucesso"}
 
     

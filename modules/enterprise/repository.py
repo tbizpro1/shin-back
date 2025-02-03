@@ -4,9 +4,10 @@ from django.db import models
 from django.shortcuts import get_object_or_404
 from ninja import UploadedFile, File
 from core import settings
-from modules.enterprise.models import Enterprise,CompanyMetrics
+from modules.enterprise.models import Enterprise,CompanyMetrics,Record
 from ..user_enterprise.repository import UserEnterpriseRepository
 from cloudinary.uploader import upload
+from django.db.models import Q
 
 class EnterpriseRepository:
     """
@@ -88,12 +89,11 @@ class EnterpriseRepository:
         return instance
 
     @classmethod
-    def delete(cls, *, id: int, **kwargs) -> None:
-        """
-        Deleta uma empresa pelo ID.
-        """
-        instance = cls.get(id=id)
+    def delete(
+        cls, *, instance: models.Model
+        ) -> models.Model:
         instance.delete()
+        return instance
 
     @classmethod
     def upload_file(cls, *, id: int, file: UploadedFile, **kwargs) -> models.Model:
@@ -125,7 +125,14 @@ class CompanyMetricsRepository:
     """
 
     model = CompanyMetrics
-
+    @classmethod
+    def get(cls, *, id: int) -> models.Model:
+        """
+        Retorna uma empresa específica pelo ID ou lança um erro 404.
+        """
+        object = get_object_or_404(cls.model, id=id)
+      
+        return object
     @classmethod
     def list(cls)-> models.QuerySet:
         """
@@ -146,26 +153,101 @@ class CompanyMetricsRepository:
         print("no repositoru",response)
         return response
     @classmethod
-    def update_company_metrics(cls, *, id: int, payload: Dict) -> models.Model:
-        """
-        Atualiza uma CompanyMetrics existente com os dados fornecidos.
-        """
-        # Busca o objeto existente
-        company_metrics = get_object_or_404(cls.model, id=id)
+    def put(cls, id: int, payload: dict) -> models.Model:
+            """
+            Atualiza um registro existente com base nos campos fornecidos no payload.
+            Apenas os campos enviados são atualizados.
+            """
+            print(f"Payload recebido no repositório: {payload} e ID: {id}")
+
+            instance = cls.get(id=id)
+            print(f"Instância antes da atualização: {instance.__dict__}")
+
+            # Exclui os campos não enviados para evitar sobrescrever com None
+            filtered_payload = {k: v for k, v in payload.items() if v is not None}
+
+            for key, value in filtered_payload.items():
+                setattr(instance, key, value)
+                print(f"{key} atualizado para {value}")
+
+
+                instance.save()
+
+            print(f"Instância após atualização: {instance.__dict__}")
+            return instance
         
-        # Atualiza os campos
-        for field, value in payload.items():
-            setattr(company_metrics, field, value)
-        
-        # Salva as mudanças
-        company_metrics.save()
-        
-        return company_metrics
 
     @classmethod
-    def delete(cls, *, id: int, **kwargs) -> None:
-        """
-        Deleta uma empresa pelo ID.
-        """
-        instance = cls.get(id=id)
+    def delete(
+        cls, *, instance: models.Model
+        ) -> models.Model:
         instance.delete()
+        return instance
+    
+class RecordRepository:
+        """
+        Repositório para a modelagem de Enterprise.
+        Gerencia operações CRUD no banco de dados.
+        """
+
+        model = Record
+        @classmethod
+        def get(cls, *, id: int) -> models.Model:
+            """
+            Retorna uma empresa específica pelo ID ou lança um erro 404.
+            """
+            object = get_object_or_404(cls.model, id=id)
+      
+            return object
+        
+        @classmethod
+        def list(cls)-> models.QuerySet:
+            """
+            Retorna todas as empresas ordenadas por ID.
+            """
+            return cls.model.objects.all().order_by("id")
+        
+        @classmethod
+        def post(cls, *, payload: Dict) -> models.Model:
+            print(f"Payload recebido no repository: {payload}")
+            id = payload["enterprise"]
+            enterprise = EnterpriseRepository.get(id=payload["enterprise"])
+            payload["enterprise"] = enterprise
+            response = cls.model.objects.create(**payload)
+            return response
+        
+        @classmethod
+        def put(cls, id: int, payload: dict) -> models.Model:
+            """
+            Atualiza um registro existente com base nos campos fornecidos no payload.
+            Apenas os campos enviados são atualizados.
+            """
+            print(f"Payload recebido no repositório: {payload} e ID: {id}")
+
+            instance = cls.get(id=id)
+            print(f"Instância antes da atualização: {instance.__dict__}")
+
+            # Exclui os campos não enviados para evitar sobrescrever com None
+            filtered_payload = {k: v for k, v in payload.items() if v is not None}
+
+            for key, value in filtered_payload.items():
+                setattr(instance, key, value)
+                print(f"{key} atualizado para {value}")
+
+
+                instance.save()
+
+            print(f"Instância após atualização: {instance.__dict__}")
+            return instance
+        
+        @classmethod
+        def delete(cls, instance: models.Model) -> models.Model:
+            
+            instance.delete()
+            return instance
+        
+        @classmethod
+        def search(cls, *, search: str) -> models.QuerySet:
+            return cls.model.objects.filter(
+                Q(name__istartswith=search)
+            )

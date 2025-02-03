@@ -1,6 +1,6 @@
 from modules.enterprise.models import Enterprise
 from ninja_extra import api_controller, route
-from modules.enterprise.services import EnterpriseServices,CompanyMetricsServices
+from modules.enterprise.services import EnterpriseServices,CompanyMetricsServices, RecordServices
 from modules.enterprise.schemas import (
     EnterpriseListSchema,
     EnterprisePostSchema,
@@ -9,14 +9,20 @@ from modules.enterprise.schemas import (
     CompanyMetricsFilterSchema,
     CompanyMetricsListSchema,
     CompanyMetricsPostSchema,
-    CompanyMetricsGetSchema
+    CompanyMetricsGetSchema,
+    RecordInSchema,
+    RecordOutSchema,
+    RecordFilterSchema,
+    RecordPutSchema,
+    CompanyMetricsPutSchema
 )
 import requests
 from modules.user_enterprise.repository import UserEnterpriseRepository
-from typing import List
-from ninja import Form, File, UploadedFile,Query
+from typing import List, Dict,Any
+from ninja import Form, File, UploadedFile,Query,Body
 from ..logs.services import LogService
 from django.http import JsonResponse
+from django.db.models.query import QuerySet
 
 
 @api_controller(
@@ -187,19 +193,18 @@ class EnterpriseController:
         )
         return updated_enterprise
 
-    @route.delete('/{id}', response={204: None})
+    @route.delete('/{id}',response= {200: Dict[str, str], 404: ErrorResponse, 500: ErrorResponse})
     def delete(self, request, id: int):
         """
         Deleta uma empresa pelo ID.
         """
-        user_id = request.user.id
-        self.services.delete(id=id)
+        user_id = request.user.id 
         self.log_service.create_log(
             user_id=user_id, 
             change_type="delete", 
             description="Você deletou uma empresa."
         )
-        return 204, None
+        return self.services.delete(id=id)
 
     @route.post('file/{id}', response={200: EnterpriseListSchema, 404: ErrorResponse, 500: ErrorResponse})
     def upload_file(self, request, id: int, file: UploadedFile = File(...)):
@@ -214,18 +219,6 @@ class EnterpriseController:
             description="Você atualizou a foto de uma empresa."
         )
         return updated_file
-
-    @route.get('tokenrd/')
-    def checkToken(self, request):
-        """
-        Atualiza o arquivo associado à empresa.
-        """
-        url = "https://crm.rdstation.com/api/v1/token/check?token=6762e9a8ccd3ee001af5dc23"
-        headers = {"accept": "application/json"}
-
-        response = requests.get(url, headers=headers)
-
-        print(f"resposta{response.text}resposta")
         
 @api_controller(
     '/company-metrics',
@@ -248,37 +241,81 @@ class CompanyMetricsController:
         queryset = self.services.list(filters=filters.dict(exclude_none=True))
         print("no controller",queryset,"acabou no contorller")
         return queryset
-        
-        @route.get("/{company_metric_id}", response=CompanyMetricsGetSchema)
-        def get_by_id(self,request, company_metric_id: int):
+    @route.put('/{id}', response= {201: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def put(self, request, id: int, payload: CompanyMetricsPutSchema = Body(...)):
+        """
+        Rota para Atualizar um Bioma por ID.
+        """
+        print(f"Payload recebido no controlador: {payload}")
+        return self.services.update(id=id, payload=payload.dict())
+    
+    @route.get("/{company_metric_id}", response=CompanyMetricsGetSchema)
+    def get_by_id(self,request, company_metric_id: int):
+            
             response = CompanyMetricsServices.company_metrics_by_id(id=company_metric_id)
             if not response:
                 return {"error": "register not found"}
             return response
-    
+
+
+
     @route.post("/", response={200:CompanyMetricsGetSchema,201:CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
     def create( self, 
         request, 
         payload: CompanyMetricsPostSchema = Form(...)):
         response = CompanyMetricsServices.create(payload=payload)
-        print("respostaa",response)
+  
+ 
+        print(f"payload no controller: {payload.dict()}")
         if not response:
             return {"error": "register not found"}
         return response
 
-    @route.put("/{company_metric_id}", response={200: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
-    def update(request, company_metric_id: int, payload: CompanyMetricsPostSchema):
-        """
-        Atualiza uma CompanyMetrics existente.
-        """
-        response, status_code = CompanyMetricsServices.update(id=company_metric_id, payload=payload.dict())
-        return JsonResponse(response, status=status_code)
 
-    @route.delete('/{company_metric_id}', response={204: None})
+    @route.delete('/{company_metric_id}', response= {200: Dict[str, str], 404: ErrorResponse, 500: ErrorResponse})
     def delete(self,company_metric_id: int):
         """
         Exclui uma CompanyMetrics pelo ID.
         """
-        self.services.delete(id=id)
+
+        return self.services.delete(id=company_metric_id)
+
+
+@api_controller(
+    '/records',
+    tags=['Rota - Prontuários'],
+    
+)
+class RecordController:
+    
+    services= RecordServices
+
+    @route.get('/', response= {200: List[RecordOutSchema], 404: ErrorResponse, 500: ErrorResponse})
+    def list(self, request, filters: RecordFilterSchema = Query(...)) -> QuerySet[Any]:
+        """
+        Rota para Listar todos os Biomas.
+        """
+        return self.services.list(filters=filters)
+    
+    @route.post('', response= {201: RecordOutSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def post(self, request, payload: RecordInSchema = Form(...)):
+        """
+        Rota para Criar um Bioma.
+        """
         
-        return 204,None
+        return self.services.post(payload=payload.dict())
+    
+    @route.get('/{id}/', response= {200: RecordOutSchema, 404: ErrorResponse, 500: ErrorResponse})
+    def get(self, request, id: int):
+        """
+        Rota para Listar um Bioma por ID.
+        """
+        return self.services.get(id=id)
+    @route.put('/{id}/', response= {201: RecordOutSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def put(self, request, id: int, payload: RecordPutSchema = Body(...)):
+        """
+        Rota para Atualizar um Bioma por ID.
+        """
+        print(f"Payload recebido no controlador: {payload}")
+        return self.services.put(id=id, payload=payload.dict())
+    

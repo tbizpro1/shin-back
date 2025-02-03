@@ -1,11 +1,13 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple, Union
 from django.db import models
 from django.shortcuts import get_object_or_404
 from modules.user_enterprise.models import UserEnterprise
 from modules.user.models import User
 from modules.enterprise.models import Enterprise
 from typing import Any, Dict, Optional, Tuple, List, Union
-
+from .schemas import UserEnterpriseListSchema, UserEnterprisePostSchema, UserEnterprisePutSchema, ErrorResponse
+from django.db import transaction, IntegrityError
+from ninja_extra import status
 
 class UserEnterpriseRepository:
     """
@@ -63,13 +65,10 @@ class UserEnterpriseRepository:
         return instance
 
     @classmethod
-    def delete(cls, *, id: int, **kwargs) -> None:
-        """
-        Deleta uma relação UserEnterprise pelo ID.
-        """
-        instance = cls.get(id=id)
+    def delete(cls, instance: models.Model) -> models.Model:
+        
         instance.delete()
-
+        return instance
     @classmethod
     def list_by_user(cls, *, user_id: int) -> models.QuerySet:
         """

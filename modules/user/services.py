@@ -109,7 +109,7 @@ class Services:
 
                 instance = cls.repository.delete(instance=instance)
 
-                return status.HTTP_204_NO_CONTENT, instance
+                return status.HTTP_200_OK, {"message": "Usuário deletado com sucesso"}
             
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}

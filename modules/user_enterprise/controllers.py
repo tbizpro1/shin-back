@@ -1,5 +1,5 @@
 from ninja_extra import api_controller, route
-from typing import List, Optional
+from typing import List, Optional, Dict
 from modules.user_enterprise.repository import UserEnterpriseRepository
 from modules.user_enterprise.schemas import (
     UserEnterpriseListSchema,
@@ -18,7 +18,7 @@ from ..user.repository import Repository as UserRepository
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render
-
+from .services import UserEnterpriseServices
 
 # Filtro de consulta para as relações UserEnterprise
 class Filters(Schema):
@@ -36,7 +36,7 @@ class Filters(Schema):
 class UserEnterpriseController:
     log_service = LogService()  # Instância do LogService
     repository = UserEnterpriseRepository
-
+    services = UserEnterpriseServices
     @staticmethod
     def handle_invitation(request, token):
         try:
@@ -243,13 +243,9 @@ class UserEnterpriseController:
 
         
 
-    @route.delete('/{id}', response={204: None})
+    @route.delete('/{id}',  response= {200: Dict[str, str], 404: ErrorResponse, 500: ErrorResponse})
     def delete(self, request, id: int):
-        """
-        Deleta uma relação UserEnterprise pelo ID.
-        """
-        self.repository.delete(id=id)
-        return None
+        return self.services.delete(id=id)
 
     @route.get('/user/{user_id}', response={200: List[UserEnterpriseListSchema]})
     def list_by_user(self, request, user_id: int):

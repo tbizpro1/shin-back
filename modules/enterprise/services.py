@@ -4,12 +4,15 @@ from django.db import models
 from django.db import transaction, IntegrityError
 from django.http import Http404
 from ninja_extra import status
-from .repository import EnterpriseRepository,CompanyMetricsRepository
+from .repository import EnterpriseRepository,CompanyMetricsRepository,RecordRepository
 from .schemas import EnterpriseListSchema,CompanyMetricsGetSchema
 from .models import Enterprise,CompanyMetrics
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from datetime import date
 
 def validate_company_metrics_payload(payload: Dict[str, Any]) -> Optional[Dict[str, str]]:
     """
@@ -127,57 +130,14 @@ class EnterpriseServices:
         return enterprise_list
     
     @classmethod
-    def get(cls, *, id: int) -> Tuple[int, Dict[str, Any]]:
-        """
-        Retorna uma empresa pelo ID ou lança erro.
-        """
+    def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
         try:
-            instance: Enterprise = cls.repository.get(id=id)
-            print("🔥 Instance ORM:", instance)  # Mostra a representação do objeto no Django ORM
-            print("🔥 Instance as dict:", instance.__dict__)
-            # ✅ Converter `instance` para `EnterpriseListSchema`
-            enterprise_response = EnterpriseListSchema(
-                enterprise_id=instance.enterprise_id,
-                name=instance.name,
-                email=instance.email,
-                linkedin=instance.linkedin,
-                instagram=instance.instagram,
-                whatsapp=instance.whatsapp,
-                website=instance.website,
-                summary=instance.summary,
-                cnpj=instance.cnpj,
-                foundation_year=instance.foundation_year,
-                city=instance.city,
-                state=instance.state,
-                market=instance.market,
-                segment=instance.segment,
-                problem=instance.problem,
-                solution=instance.solution,
-                differential=instance.differential or "",  # ✅ Garante string válida
-                client_type=instance.client_type,
-                product=instance.product,
-                product_stage=instance.product_stage,
-                value_proposition=instance.value_proposition,
-                competitors=instance.competitors,
-                business_model=instance.business_model,
-                revenue_model=instance.revenue_model,
-                invested=instance.invested,
-                investment_value=instance.investment_value,
-                boosting=instance.boosting,
-                funding_value=instance.funding_value,
-                funding_program=instance.funding_program,
-                accelerated=instance.accelerated,
-                accelerator_name=instance.accelerator_name,
-                discovered_startup=instance.discovered_startup,
-                other_projects=instance.other_projects,
-                profile_picture=instance.profile_picture
-            )
-
-            return status.HTTP_200_OK, enterprise_response.model_dump()  # ✅ Retorna dicionário compatível
-
+            return status.HTTP_200_OK, cls.repository.get(id=id)
         except Http404:
-            return status.HTTP_404_NOT_FOUND, {"message": "Enterprise not found"}
-
+            return status.HTTP_404_NOT_FOUND, {"message": (
+                f"{cls.repository.model._meta.verbose_name.capitalize()} not found"
+                ' não existe'
+            ) }
     @classmethod
     def post(
         cls, *, payload: Dict[str, Any], file: Optional[UploadedFile] = File(None), **kwargs
@@ -258,17 +218,21 @@ class EnterpriseServices:
     def delete(
         cls, *, id: int, **kwargs
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
-        """
-        Deleta uma empresa pelo ID.
-        """
         try:
             with transaction.atomic():
+                status_code: int
+                message_or_object: Dict[str, str] | models.Model
+
                 status_code, message_or_object = cls.get(id=id)
                 if status_code != status.HTTP_200_OK:
                     return status_code, message_or_object
                 
-                cls.repository.delete(id=id)
-                return status.HTTP_204_NO_CONTENT, {"message": "Enterprise deleted successfully"}
+                instance: models.Model = message_or_object
+
+                instance = cls.repository.delete(instance=instance)
+
+                return status.HTTP_200_OK, {"message": "Empresa deletado com sucesso"}
+            
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
 
@@ -336,7 +300,16 @@ class CompanyMetricsServices:
     """
 
     repository = CompanyMetricsRepository
-
+    @classmethod
+    def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
+        try:
+            return status.HTTP_200_OK, cls.repository.get(id=id)
+        except Http404:
+            return status.HTTP_404_NOT_FOUND, {"message": (
+                f"{cls.repository.model._meta.verbose_name.capitalize()} not found"
+                ' não existe'
+            ) }
+        
     @classmethod
     def list(cls, *, filters: Optional[dict] = None) -> List[CompanyMetricsGetSchema]:
         queryset = CompanyMetrics.objects.all()
@@ -367,9 +340,9 @@ class CompanyMetricsServices:
             with transaction.atomic():
                 print("passou aquii",payload)
                 validation_errors = validate_company_metrics_payload(payload=payload_dict)
-                print("nao passou")
+                
                 id_enterprise=payload_dict.get("enterprise")
-
+                print("passou, esse é o id enterprise",id_enterprise)
                 try:
                     instance_enterprise:Enterprise = Enterprise.objects.get(enterprise_id=id_enterprise)
                 except ObjectDoesNotExist:
@@ -384,7 +357,7 @@ class CompanyMetricsServices:
                 print("companyyyy",company_metrics)
                 company_metrics_data = CompanyMetricsGetSchema(
                     id=company_metrics.id,
-                    enterprise=company_metrics.enterprise.enterprise_id,  # ou qualquer outro campo relevante
+                    enterprise_id=id_enterprise,  # ou qualquer outro campo relevante
                     team_size=company_metrics.team_size,
                     revenue_period=company_metrics.revenue_period,
                     total_clients=company_metrics.total_clients,
@@ -401,60 +374,238 @@ class CompanyMetricsServices:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
 
     @classmethod
-    def update(cls, *, id: int, payload: Dict[str, Any]) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
-        """
-        Atualiza uma CompanyMetrics existente com os dados fornecidos.
-        """
+    def update(
+        cls,
+        *,
+        id: int,
+        payload: Dict[str, Any],
+        **kwargs
+    ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
+        
         try:
-            payload_dict = payload.__dict__
+            print(f"Payload recebido no serviço: {payload}")
             with transaction.atomic():
-                validation_errors = validate_company_metrics_payload(payload=payload_dict)
-                id_enterprise = payload_dict.get("enterprise")
+                status_code: int
+                message: Dict[str, str]
 
-                try:
-                    instance_enterprise: Enterprise = Enterprise.objects.get(enterprise_id=id_enterprise)
-                except ObjectDoesNotExist:
-                    raise ValueError(f"Enterprise com ID {id_enterprise} não encontrado.")
+                # Aqui você pode deixar o código de validação descomentado quando quiser validar
+                # status_code, message_or_object = cls.validate_payload(payload=payload, id=id)
 
-                if validation_errors:
-                    return status.HTTP_400_BAD_REQUEST, validation_errors
-                payload_dict["enterprise"] = instance_enterprise
+                # if status_code != status.HTTP_200_OK:
+                #     message = message_or_object
+                #     return status_code, message
 
-                # Atualizar o objeto CompanyMetrics
-                company_metrics = CompanyMetricsRepository.update_company_metrics(id=id, payload=payload_dict)
+                # A instância do modelo deve ser recuperada antes de ser passada ao repositório
 
-                # Serializar os dados atualizados
-                company_metrics_data = CompanyMetricsGetSchema(
-                    enterprise=company_metrics.enterprise.enterprise_id,
-                    team_size=company_metrics.team_size,
-                    revenue_period=company_metrics.revenue_period,
-                    total_clients=company_metrics.total_clients,
-                    new_clients=company_metrics.new_clients,
-                    investment_round_open=company_metrics.investment_round_open,
-                    capital_needed=company_metrics.capital_needed,
-                    value_invested=company_metrics.value_invested,
-                    value_foment=company_metrics.value_foment,
-                    valuation=company_metrics.valuation
-                )
 
-                return status.HTTP_200_OK, company_metrics_data.dict()
-        except IntegrityError as error:
-            return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+                # Passa a instância e o payload para a função `put` no repositório
+                updated_instance = cls.repository.put( payload=payload, id=id)
+                
+                # Aqui, `updated_instance` é o objeto atualizado que será retornado
+                response_dict = updated_instance.__dict__
+                print("response_dict",response_dict)
+                return status.HTTP_201_CREATED, {
+    "id": response_dict["id"],
+    "enterprise_id": response_dict["enterprise_id"],
+    "team_size": response_dict["team_size"],
+    "revenue_period": float(response_dict["revenue_period"]),  # Convertendo Decimal para float
+    "total_clients": response_dict["total_clients"],
+    "new_clients": response_dict["new_clients"],
+    "investment_round_open": response_dict["investment_round_open"],
+    "capital_needed": float(response_dict["capital_needed"]),  # Convertendo Decimal para float
+    "value_invested": float(response_dict["value_invested"]),  # Convertendo Decimal para float
+    "value_foment": float(response_dict["value_foment"]),  # Convertendo Decimal para float
+    "valuation": response_dict["valuation"],
+    "date_recorded": response_dict["date_recorded"].isoformat()  # Convertendo datetime para string
+}
 
+        except Exception as e:
+            print(f"Erro durante o processamento: {e}")
+            return status.HTTP_400_BAD_REQUEST, {"error": str(e)}
     @classmethod
     def delete(
         cls, *, id: int, **kwargs
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
-        """
-        Deleta uma empresa pelo ID.
-        """
         try:
             with transaction.atomic():
+                status_code: int
+                message_or_object: Dict[str, str] | models.Model
+
                 status_code, message_or_object = cls.get(id=id)
                 if status_code != status.HTTP_200_OK:
                     return status_code, message_or_object
                 
-                cls.repository.delete(id=id)
-                return status.HTTP_204_NO_CONTENT, {"message": "Enterprise deleted successfully"}
+                instance: models.Model = message_or_object
+
+                instance = cls.repository.delete(instance=instance)
+
+                return status.HTTP_200_OK, {"message": "Empresa deletado com sucesso"}
+            
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+        
+
+        
+class RecordServices:
+    """
+    Serviços para operações no modelo Company Metrics.
+    """
+
+    repository = RecordRepository
+
+    # @classmethod
+    # def validate_payload(cls, data):
+    #     """
+    #     Valida o payload antes de criar ou atualizar o registro.
+    #     """
+    #     required_fields = ['enterprise', 'date_collected', 'responsible', 'data_type', 'mit_phase', 'product_status', 'business_status']
+    #     for field in required_fields:
+    #         if field not in data or not data[field]:
+    #             raise ValidationError(_("Campo '{}' é obrigatório.".format(field)))
+
+    #     if data['data_type'] not in dict(cls.TRL.choices):
+    #         raise ValidationError(_("Valor inválido para 'data_type'."))        
+    #     if data['mit_phase'] not in dict(cls.MITPhase.choices):
+    #         raise ValidationError(_("Valor inválido para 'mit_phase'."))        
+    #     if data['product_status'] not in dict(cls.ProductStatus.choices):
+    #         raise ValidationError(_("Valor inválido para 'product_status'."))        
+    #     if data['business_status'] not in dict(cls.BusinessStatus.choices):
+    #         raise ValidationError(_("Valor inválido para 'business_status'."))
+
+    #     if data.get('next_meeting_date') and data['next_meeting_date'] < date.today():
+    #         raise ValidationError(_("A data da próxima agenda não pode ser no passado."))
+
+    #     return status.HTTP_200_OK, {}
+    @classmethod
+    def list(cls, *, filters: Optional[Any] = None) -> models.QuerySet:
+        queryset = cls.repository.list()
+        if filters is not None:
+            queryset = filters.filter(queryset)
+        response = []
+        for record in queryset:
+            record_dict = {
+                "id": record.id,
+                "enterprise": record.enterprise_id,  # Adiciona o ID da empresa, não a instância
+                "date_collected": record.date_collected,
+                "responsible": record.responsible,
+                "data_type": record.data_type,
+                "mit_phase": record.mit_phase,
+                "product_status": record.product_status,
+                "business_status": record.business_status,
+                "how_we_can_help": record.how_we_can_help,
+                "next_steps": record.next_steps,
+                "next_meeting_date": record.next_meeting_date,
+                "observations": record.observations,
+            }
+            response.append(record_dict)
+        
+        return response
+        
+    @classmethod
+    def post(
+        cls, *, payload: Dict[str, Any], **kwargs
+    ) -> Tuple [int, Union[models.Model, Dict[str, str]]]:
+        try:
+            with transaction.atomic():
+                status_code: int
+                message: Dict[str, str]
+
+                # status_code, message = cls.validate_payload(payload)
+
+                # if status_code != status.HTTP_200_OK:
+                #     return status_code, message
+                
+                instance = cls.repository.post(payload=payload)
+                response_dict = instance.__dict__
+                
+                return status.HTTP_201_CREATED, {
+                "id": response_dict["id"],
+                "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
+                "date_collected": response_dict["date_collected"],
+                "responsible": response_dict["responsible"],
+                "data_type": response_dict["data_type"],
+                "mit_phase": response_dict["mit_phase"],
+                "product_status": response_dict["product_status"],
+                "business_status": response_dict["business_status"],
+                "how_we_can_help": response_dict.get("how_we_can_help", None),
+                "next_steps": response_dict.get("next_steps", None),
+                "next_meeting_date": response_dict.get("next_meeting_date", None),
+                "observations": response_dict.get("observations", None),
+            }   
+        except IntegrityError as error:
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+        
+    @classmethod
+    def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
+        try:
+            response_dict = cls.repository.get(id=id).__dict__
+            return status.HTTP_200_OK, {
+                "id": response_dict["id"],
+                "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
+                "date_collected": response_dict["date_collected"],
+                "responsible": response_dict["responsible"],
+                "data_type": response_dict["data_type"],
+                "mit_phase": response_dict["mit_phase"],
+                "product_status": response_dict["product_status"],
+                "business_status": response_dict["business_status"],
+                "how_we_can_help": response_dict.get("how_we_can_help", None),
+                "next_steps": response_dict.get("next_steps", None),
+                "next_meeting_date": response_dict.get("next_meeting_date", None),
+                "observations": response_dict.get("observations", None),
+            }
+        except Http404:
+            return status.HTTP_404_NOT_FOUND, {"message": (
+                f"{cls.repository.model._meta.verbose_name.capitalize()} not found"
+                ' não existe'
+            ) }
+        
+
+    @classmethod
+    def put(
+        cls,
+        *,
+        id: int,
+        payload: Dict[str, Any],
+        **kwargs
+    ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
+        
+        try:
+            print(f"Payload recebido no serviço: {payload}")
+            with transaction.atomic():
+                status_code: int
+                message: Dict[str, str]
+
+                # Aqui você pode deixar o código de validação descomentado quando quiser validar
+                # status_code, message_or_object = cls.validate_payload(payload=payload, id=id)
+
+                # if status_code != status.HTTP_200_OK:
+                #     message = message_or_object
+                #     return status_code, message
+
+                # A instância do modelo deve ser recuperada antes de ser passada ao repositório
+
+
+                # Passa a instância e o payload para a função `put` no repositório
+                updated_instance = cls.repository.put( payload=payload, id=id)
+                
+                # Aqui, `updated_instance` é o objeto atualizado que será retornado
+                response_dict = updated_instance.__dict__
+                
+                return status.HTTP_201_CREATED, {
+                    "id": response_dict["id"],
+                    "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
+                    "date_collected": response_dict["date_collected"],
+                    "responsible": response_dict["responsible"],
+                    "data_type": response_dict["data_type"],
+                    "mit_phase": response_dict["mit_phase"],
+                    "product_status": response_dict["product_status"],
+                    "business_status": response_dict["business_status"],
+                    "how_we_can_help": response_dict.get("how_we_can_help", None),
+                    "next_steps": response_dict.get("next_steps", None),
+                    "next_meeting_date": response_dict.get("next_meeting_date", None),
+                    "observations": response_dict.get("observations", None),
+                }
+
+        except Exception as e:
+            print(f"Erro durante o processamento: {e}")
+            return status.HTTP_400_BAD_REQUEST, {"error": str(e)}
