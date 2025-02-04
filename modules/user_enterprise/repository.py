@@ -84,3 +84,7 @@ class UserEnterpriseRepository:
         """
         enterprise = get_object_or_404(Enterprise, enterprise_id=enterprise_id)
         return cls.model.objects.filter(enterprise=enterprise).order_by("ue_id")
+
+    @classmethod
+    def get_by_user_and_enterprise(cls,*, user_id: int, enterprise_id: int):
+        return cls.model.objects.filter(user_id=user_id, enterprise_id=enterprise_id).first()

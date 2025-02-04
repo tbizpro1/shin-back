@@ -62,11 +62,9 @@ class Repository:
                 file_url = upload_response.get("secure_url")
                 payload["profile_picture"] = file_url
             except Exception as e:
-                print(f"Erro ao fazer upload para o Cloudinary: {e}")
                 raise e
         
         payload = cls.update_payload(payload=payload)
-        print(f"Payload atualizado: {payload}") 
         return cls.model.objects.create(**payload)
     
     @classmethod
@@ -84,7 +82,6 @@ class Repository:
         for attr, value in payload.items():
             if value:
                 setattr(instance, attr, value)
-                print(f"{attr} = {value}")
         instance.save()
     
         return instance
@@ -117,7 +114,6 @@ class Repository:
             file_url = upload_response.get("secure_url")
             instance.profile_picture = file_url  # Atualizar o campo profile_picture com a URL gerada
         except Exception as e:
-            print(f"Erro ao fazer upload para o Cloudinary: {e}")
             raise e
 
         instance.save()

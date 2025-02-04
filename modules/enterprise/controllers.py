@@ -43,7 +43,6 @@ class EnterpriseController:
         Retorna a lista de empresas cadastradas.
         """
         user_id = request.user.id
-        print('user_id', user_id)
 
         result = self.services.list()
 
@@ -241,14 +240,12 @@ class CompanyMetricsController:
         """
         # Obtendo os dados com base nos filtros
         queryset = self.services.list(filters=filters.dict(exclude_none=True))
-        print("no controller",queryset,"acabou no contorller")
         return queryset
     @route.put('/{id}', response= {201: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: CompanyMetricsPutSchema = Body(...)):
         """
         Rota para Atualizar um Bioma por ID.
         """
-        print(f"Payload recebido no controlador: {payload}")
         return self.services.update(id=id, payload=payload.dict())
     
     @route.get("/{company_metric_id}", response=CompanyMetricsGetSchema)
@@ -268,7 +265,6 @@ class CompanyMetricsController:
         response = CompanyMetricsServices.create(payload=payload)
   
  
-        print(f"payload no controller: {payload.dict()}")
         if not response:
             return {"error": "register not found"}
         return response
@@ -318,6 +314,5 @@ class RecordController:
         """
         Rota para Atualizar um Bioma por ID.
         """
-        print(f"Payload recebido no controlador: {payload}")
         return self.services.put(id=id, payload=payload.dict())
     

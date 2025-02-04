@@ -30,7 +30,6 @@ class EnterpriseRepository:
         Retorna uma empresa específica pelo ID ou lança um erro 404.
         """
         object = get_object_or_404(cls.model, enterprise_id=id)
-
         return object
 
     @classmethod
@@ -63,7 +62,6 @@ class EnterpriseRepository:
                 file_url = upload_response.get("secure_url")
                 payload["profile_picture"] = file_url
             except Exception as e:
-                print(f"Erro ao fazer upload para o Cloudinary: {e}")
                 raise e
         
         # Atualiza payload antes da criação
@@ -111,7 +109,6 @@ class EnterpriseRepository:
             file_url = upload_response.get("secure_url")
             instance.profile_picture = file_url  # Atualizar o campo profile_picture com a URL gerada
         except Exception as e:
-            print(f"Erro ao fazer upload para o Cloudinary: {e}")
             raise e
 
         instance.save()
@@ -151,7 +148,6 @@ class CompanyMetricsRepository:
     @classmethod
     def create_company_metrics(cls, *, payload: Dict) -> models.Model:
         response = cls.model.objects.create(**payload)
-        print("no repositoru",response)
         return response
     @classmethod
     def put(cls, id: int, payload: dict) -> models.Model:
@@ -159,22 +155,18 @@ class CompanyMetricsRepository:
             Atualiza um registro existente com base nos campos fornecidos no payload.
             Apenas os campos enviados são atualizados.
             """
-            print(f"Payload recebido no repositório: {payload} e ID: {id}")
 
             instance = cls.get(id=id)
-            print(f"Instância antes da atualização: {instance.__dict__}")
 
             # Exclui os campos não enviados para evitar sobrescrever com None
             filtered_payload = {k: v for k, v in payload.items() if v is not None}
 
             for key, value in filtered_payload.items():
                 setattr(instance, key, value)
-                print(f"{key} atualizado para {value}")
 
 
                 instance.save()
 
-            print(f"Instância após atualização: {instance.__dict__}")
             return instance
         
 
@@ -210,7 +202,6 @@ class RecordRepository:
         
         @classmethod
         def post(cls, *, payload: Dict) -> models.Model:
-            print(f"Payload recebido no repository: {payload}")
             id = payload["enterprise"]
             enterprise = EnterpriseRepository.get(id=payload["enterprise"])
             payload["enterprise"] = enterprise
@@ -223,22 +214,18 @@ class RecordRepository:
             Atualiza um registro existente com base nos campos fornecidos no payload.
             Apenas os campos enviados são atualizados.
             """
-            print(f"Payload recebido no repositório: {payload} e ID: {id}")
 
             instance = cls.get(id=id)
-            print(f"Instância antes da atualização: {instance.__dict__}")
 
             # Exclui os campos não enviados para evitar sobrescrever com None
             filtered_payload = {k: v for k, v in payload.items() if v is not None}
 
             for key, value in filtered_payload.items():
                 setattr(instance, key, value)
-                print(f"{key} atualizado para {value}")
 
 
                 instance.save()
 
-            print(f"Instância após atualização: {instance.__dict__}")
             return instance
         
         @classmethod

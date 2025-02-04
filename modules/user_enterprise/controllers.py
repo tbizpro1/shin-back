@@ -8,7 +8,7 @@ from modules.user_enterprise.schemas import (
     ErrorResponse,
 )
 from datetime import datetime
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from modules.user_enterprise.models import UserEnterprise
 from ninja import Schema
 from pydantic import Field
@@ -102,7 +102,6 @@ class UserEnterpriseController:
         Retorna os detalhes de uma relação UserEnterprise pelo ID.
         """
         user_enterprise = self.repository.get(id=id)
-        print(f"UserEnterprise: {user_enterprise.__dict__}")
         return {
             "ue_id": user_enterprise.ue_id,
             "user_id": user_enterprise.user.id,
@@ -117,14 +116,21 @@ class UserEnterpriseController:
 
         }
 
-    @route.post('', response={200: UserEnterpriseListSchema, 500: ErrorResponse})
+    @route.post('', response={200: UserEnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def post(self, request, payload: UserEnterprisePostSchema):
         """
         Cria uma nova relação UserEnterprise.
         """
+
+        # Verifica se já existe uma relação entre o usuário e a empresa
+        existing_relation = self.repository.get_by_user_and_enterprise(user_id=payload.user_id, enterprise_id=payload.enterprise_id)
+        if existing_relation:
+            return JsonResponse({"error": "O usuário já está associado a esta empresa."}, status=400)
+
         base_url = request.build_absolute_uri('/')[:-1].strip("/")
         user_email = UserRepository.get(id=payload.user_id).email
 
+        # Cria a nova relação UserEnterprise
         user_enterprise = self.repository.post(payload=payload.dict())
         self.log_service.create_log(
             user_id=user_enterprise.user.id, 
@@ -143,44 +149,44 @@ class UserEnterpriseController:
             message="",
             from_email="noreply@shin.com",
             recipient_list=[user_email],
-    html_message=f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Convite para Participar</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; }}
-            .email-container {{ max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; }}
-            .email-header {{ background: linear-gradient(45deg, #007bff, #0056b3); color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }}
-            .email-body {{ padding: 20px; color: #333; }}
-            .email-body a {{ text-decoration: none; background-color: #007bff; color: #fff; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block; }}
-            .email-body a.decline {{ background-color: #dc3545; }}
-            .token {{ font-weight: bold; font-size: 20px; background: #f8f9fa; padding: 10px; border-radius: 4px; display: inline-block; margin: 10px 0; }}
-            .footer {{ text-align: center; padding: 10px; font-size: 14px; color: #666; }}
-        </style>
-    </head>
-    <body>
-        <div class="email-container">
-            <div class="email-header">
-                <h1>Convite para Participar</h1>
-            </div>
-            <div class="email-body">
-                <p>Olá,</p>
-                <p>Você foi convidado para participar da <strong>{enterprise_name}</strong>.</p>
-                <a href="{link_response}" target="_blank">Responder convite</a>
-                <p>Ou copie o seguinte código e insira no aplicativo:</p>
-                <p class="token">{token}</p>
-                <p>Se você não esperava este convite, pode ignorar este e-mail.</p>
-            </div>
-            <div class="footer">
-                <p>Atenciosamente,<br><strong>{enterprise_name}</strong></p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
+            html_message=f"""
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Convite para Participar</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; }}
+                    .email-container {{ max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; }}
+                    .email-header {{ background: linear-gradient(45deg, #007bff, #0056b3); color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }}
+                    .email-body {{ padding: 20px; color: #333; }}
+                    .email-body a {{ text-decoration: none; background-color: #007bff; color: #fff; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block; }}
+                    .email-body a.decline {{ background-color: #dc3545; }}
+                    .token {{ font-weight: bold; font-size: 20px; background: #f8f9fa; padding: 10px; border-radius: 4px; display: inline-block; margin: 10px 0; }}
+                    .footer {{ text-align: center; padding: 10px; font-size: 14px; color: #666; }}
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <div class="email-header">
+                        <h1>Convite para Participar</h1>
+                    </div>
+                    <div class="email-body">
+                        <p>Olá,</p>
+                        <p>Você foi convidado para participar da <strong>{enterprise_name}</strong>.</p>
+                        <a href="{link_response}" target="_blank">Responder convite</a>
+                        <p>Ou copie o seguinte código e insira no aplicativo:</p>
+                        <p class="token">{token}</p>
+                        <p>Se você não esperava este convite, pode ignorar este e-mail.</p>
+                    </div>
+                    <div class="footer">
+                        <p>Atenciosamente,<br><strong>{enterprise_name}</strong></p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
         )
 
         return {
@@ -193,6 +199,7 @@ class UserEnterpriseController:
             "status": user_enterprise.status,
             "token": user_enterprise.token,
         }
+
 
     @route.put('/{id}', response={200: UserEnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: UserEnterprisePutSchema):

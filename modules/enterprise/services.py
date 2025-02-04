@@ -22,7 +22,6 @@ def validate_company_metrics_payload(payload: Dict[str, Any]) -> Optional[Dict[s
     :return: Dicionário com erros, se houver. Retorna None se estiver válido.
     """
     errors = {}
-    print("passou no validate")
     
     if not payload.get("enterprise"):
         errors["enterprise"] = "O campo 'enterprise' é obrigatório."
@@ -86,7 +85,6 @@ class EnterpriseServices:
         queryset = cls.repository.list()
         if filters:
             queryset = queryset.filter(**filters)
-
         # Converter o QuerySet para uma lista de `EnterpriseListSchema`
         enterprise_list = [
             EnterpriseListSchema(
@@ -123,7 +121,8 @@ class EnterpriseServices:
                 accelerator_name=enterprise.accelerator_name,
                 discovered_startup=enterprise.discovered_startup,
                 other_projects=enterprise.other_projects,
-            )
+                profile_picture=enterprise.profile_picture,
+            )  
             for enterprise in queryset
         ]
 
@@ -288,7 +287,6 @@ class EnterpriseServices:
                     return status_code, message_or_object
                 
                 instance: Enterprise = cls.repository.put_picture(id=id, file=file)
-                print(f"instance: {instance}")
                 # ✅ Converter `instance` para `EnterpriseListSchema`
                 enterprise_response = EnterpriseListSchema(
                     enterprise_id=instance.enterprise_id,
@@ -354,12 +352,10 @@ class CompanyMetricsServices:
 
         if filters:
             queryset = queryset.filter(**filters)
-        print(f"o queryset com id",queryset)
         # Convertendo os objetos Django em schemas
         company_metrics_data = [
             CompanyMetricsGetSchema.from_orm(company_metric) for company_metric in queryset
         ]       
-        print(company_metrics_data,"acaboou")
         return company_metrics_data
     @classmethod
     def company_metrics_by_id(cls,*,id: int) -> models.QuerySet:
@@ -376,11 +372,9 @@ class CompanyMetricsServices:
         try:
             payload_dict = payload.__dict__
             with transaction.atomic():
-                print("passou aquii",payload)
                 validation_errors = validate_company_metrics_payload(payload=payload_dict)
                 
                 id_enterprise=payload_dict.get("enterprise")
-                print("passou, esse é o id enterprise",id_enterprise)
                 try:
                     instance_enterprise:Enterprise = Enterprise.objects.get(enterprise_id=id_enterprise)
                 except ObjectDoesNotExist:
@@ -392,7 +386,6 @@ class CompanyMetricsServices:
 
                 # Criar o objeto CompanyMetrics
                 company_metrics = CompanyMetricsRepository.create_company_metrics(payload=payload_dict)
-                print("companyyyy",company_metrics)
                 company_metrics_data = CompanyMetricsGetSchema(
                     id=company_metrics.id,
                     enterprise_id=id_enterprise,  # ou qualquer outro campo relevante
@@ -421,7 +414,6 @@ class CompanyMetricsServices:
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
         
         try:
-            print(f"Payload recebido no serviço: {payload}")
             with transaction.atomic():
                 status_code: int
                 message: Dict[str, str]
@@ -441,7 +433,6 @@ class CompanyMetricsServices:
                 
                 # Aqui, `updated_instance` é o objeto atualizado que será retornado
                 response_dict = updated_instance.__dict__
-                print("response_dict",response_dict)
                 return status.HTTP_201_CREATED, {
     "id": response_dict["id"],
     "enterprise_id": response_dict["enterprise_id"],
@@ -458,7 +449,6 @@ class CompanyMetricsServices:
 }
 
         except Exception as e:
-            print(f"Erro durante o processamento: {e}")
             return status.HTTP_400_BAD_REQUEST, {"error": str(e)}
     @classmethod
     def delete(
@@ -608,7 +598,6 @@ class RecordServices:
     ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
         
         try:
-            print(f"Payload recebido no serviço: {payload}")
             with transaction.atomic():
                 status_code: int
                 message: Dict[str, str]
@@ -645,5 +634,4 @@ class RecordServices:
                 }
 
         except Exception as e:
-            print(f"Erro durante o processamento: {e}")
             return status.HTTP_400_BAD_REQUEST, {"error": str(e)}

@@ -97,9 +97,7 @@ class UsersController:
     
     @route.post('picture/{id}', response={201: UserListSchema, 404: ErrorResponse, 500: ErrorResponse})
     def put_picture(self, request, id: int, profile_picture: UploadedFile = File(...)):
-        print("essa é a file", profile_picture)
 
-        print(f"reqeust: {request}")
         return self.services.put_picture(id=id, file=profile_picture)
 
 

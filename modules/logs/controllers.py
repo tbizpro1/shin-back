@@ -21,7 +21,6 @@ class LogController:
         Lista todos os logs associados a um usuário específico pelo ID.
         """
         try:
-            print(f'esse é o user_id {user_id}')
             logs = self.log_service.get_logs_by_user_id(user_id)
             serialized_logs = [
             {
