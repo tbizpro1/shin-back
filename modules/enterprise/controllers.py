@@ -88,7 +88,8 @@ class EnterpriseController:
                 accelerator_name=enterprise.accelerator_name,
                 discovered_startup=enterprise.discovered_startup,
                 other_projects=enterprise.other_projects,
-                profile_picture=enterprise.profile_picture
+                profile_picture=enterprise.profile_picture,
+                initial_maturity=enterprise.initial_maturity
             ).model_dump()  # Converte para dicionário
             for enterprise in result
         ]
@@ -277,6 +278,13 @@ class CompanyMetricsController:
         """
 
         return self.services.delete(id=company_metric_id)
+    
+    @route.put('/{date_company_metric}', response= {200: CompanyMetricsGetSchema, 404: ErrorResponse, 500: ErrorResponse})
+    def put(self, request, date_company_metric: str, payload: CompanyMetricsPutSchema = Body(...)):
+        """
+        Rota para Atualizar uma CompanyMetrics pela data de criação.
+        """
+        return self.services.update_by_date(date_company_metric=date_company_metric, payload=payload.dict())
 
 
 @api_controller(

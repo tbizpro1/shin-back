@@ -122,6 +122,7 @@ class EnterpriseServices:
                 discovered_startup=enterprise.discovered_startup,
                 other_projects=enterprise.other_projects,
                 profile_picture=enterprise.profile_picture,
+                initial_maturity=enterprise.initial_maturity
             )  
             for enterprise in queryset
         ]
@@ -471,6 +472,13 @@ class CompanyMetricsServices:
             
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+        
+    # @classmethod
+    # def update_by_date(cls, *, date_company_metric: str, payload: Dict[str, Any]):
+    #     try:
+    #         with transaction.atomic():
+    #             status_code: int
+    #             message_or_object: Dict[str,str] | models.Model
         
 
         
