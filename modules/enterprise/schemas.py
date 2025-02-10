@@ -30,6 +30,7 @@ class BusinessModelEnum(str, Enum):
     OUTROS = "Outros"
 
 
+
 class StateEnum(str, Enum):
     AC = "AC"
     AL = "AL"
