@@ -370,7 +370,7 @@ class EnterprisePostSchema(Schema):
     value_proposition: str
     differential: str
     competitors: str
-    business_model: Optional[BusinessModelEnum] = Field(None, title="Modelo de Negócio")
+    business_model: BusinessModelEnum = Field(None, title="Modelo de Negócio")
     revenue_model: Optional[str] = Field(None, title="Modelo de Receita")
     invested: Optional[bool] = Field(False, title="Já recebeu investimento?")
     investment_value: Optional[float] = Field(None, title="Valor Investido")
