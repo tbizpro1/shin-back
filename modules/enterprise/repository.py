@@ -1,6 +1,6 @@
 import os
-from typing import Dict, Optional
-from django.db import models
+from typing import Dict, Optional, Tuple, Any
+from django.db import models,transaction
 from django.shortcuts import get_object_or_404
 from ninja import UploadedFile, File
 from core import settings
@@ -92,8 +92,8 @@ class EnterpriseRepository:
         ) -> models.Model:
         instance.delete()
         return instance
- # Certifique-se de importar o modelo
 
+    
     @classmethod
     def put_picture(
         cls,
@@ -168,6 +168,29 @@ class CompanyMetricsRepository:
                 instance.save()
 
             return instance
+    
+    @classmethod
+    def get_by_date(cls, *, date_recorded: str, id: int) -> models.Model:
+        try:
+            return cls.model.objects.get(date_recorded=date_recorded, id=id)
+        except Exception as e:
+            raise e  
+        
+    
+
+    @classmethod
+    def update_by_date(cls, *, instance: models.Model, payload: Dict[str, Any]) -> Tuple[int, Dict[str, str]]:
+        try:
+            with transaction.atomic():
+                for field, value in payload.items():
+                    setattr(instance, field, value)  # Atualiza os campos dinamicamente
+                
+                instance.save()  # Salva no banco de dados
+
+                return 200, {"message": "Métricas atualizadas com sucesso"}
+        except Exception as e:
+            return 500, {"error": str(e)}
+
         
 
     @classmethod

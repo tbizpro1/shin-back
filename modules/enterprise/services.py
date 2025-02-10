@@ -357,6 +357,8 @@ class CompanyMetricsServices:
         company_metrics_data = [
             CompanyMetricsGetSchema.from_orm(company_metric) for company_metric in queryset
         ]       
+
+        print(f"company_metrics_data: {company_metrics_data}")
         return company_metrics_data
     @classmethod
     def company_metrics_by_id(cls,*,id: int) -> models.QuerySet:
@@ -473,12 +475,29 @@ class CompanyMetricsServices:
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
         
-    # @classmethod
-    # def update_by_date(cls, *, date_company_metric: str, payload: Dict[str, Any]):
-    #     try:
-    #         with transaction.atomic():
-    #             status_code: int
-    #             message_or_object: Dict[str,str] | models.Model
+    @classmethod
+    def update_metrics_by_date(
+        cls, *, date_recorded: str, id: int, payload: Dict[str, Any], **kwargs
+    ) -> Tuple[int, Union[models.Model, Dict[str, str]]]:
+        try:
+            with transaction.atomic():
+                # Obtém o registro pelo date_recorded e id
+                status_code, result = cls.repository.get_by_date(
+                    date_recorded=date_recorded, id=id
+                )
+
+                if status_code != status.HTTP_200_OK:
+                    return status_code, result  # Retorna erro caso não encontre
+
+                instance: models.Model = result  # Garantia que result é um Model
+                updated_instance = cls.repository.update_by_date(
+                    instance=instance, payload=payload
+                )
+
+                return status.HTTP_200_OK, updated_instance  # Retorna o objeto atualizado
+
+        except Exception as e:
+            return status.HTTP_500_INTERNAL_SERVER_ERROR, {"error": str(e)}
         
 
         
@@ -523,7 +542,6 @@ class RecordServices:
                 "id": record.id,
                 "enterprise": record.enterprise_id,  # Adiciona o ID da empresa, não a instância
                 "date_collected": record.date_collected,
-                "responsible": record.responsible,
                 "data_type": record.data_type,
                 "mit_phase": record.mit_phase,
                 "product_status": record.product_status,
@@ -532,6 +550,8 @@ class RecordServices:
                 "next_steps": record.next_steps,
                 "next_meeting_date": record.next_meeting_date,
                 "observations": record.observations,
+                "responsible_person": record.responsible_person,
+
             }
             response.append(record_dict)
         
@@ -558,7 +578,7 @@ class RecordServices:
                 "id": response_dict["id"],
                 "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
                 "date_collected": response_dict["date_collected"],
-                "responsible": response_dict["responsible"],
+                "responsible_person": response_dict["responsible_person"],
                 "data_type": response_dict["data_type"],
                 "mit_phase": response_dict["mit_phase"],
                 "product_status": response_dict["product_status"],
@@ -579,7 +599,7 @@ class RecordServices:
                 "id": response_dict["id"],
                 "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
                 "date_collected": response_dict["date_collected"],
-                "responsible": response_dict["responsible"],
+                "responsible_person": response_dict["responsible_person"],
                 "data_type": response_dict["data_type"],
                 "mit_phase": response_dict["mit_phase"],
                 "product_status": response_dict["product_status"],
@@ -630,7 +650,7 @@ class RecordServices:
                     "id": response_dict["id"],
                     "enterprise": response_dict["enterprise_id"],  # Aqui é o ID da empresa
                     "date_collected": response_dict["date_collected"],
-                    "responsible": response_dict["responsible"],
+                    "responsible_person": response_dict["responsible_person"],
                     "data_type": response_dict["data_type"],
                     "mit_phase": response_dict["mit_phase"],
                     "product_status": response_dict["product_status"],

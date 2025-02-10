@@ -257,8 +257,6 @@ class CompanyMetricsController:
                 return {"error": "register not found"}
             return response
 
-
-
     @route.post("/", response={200:CompanyMetricsGetSchema,201:CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
     def create( self, 
         request, 
@@ -270,7 +268,6 @@ class CompanyMetricsController:
             return {"error": "register not found"}
         return response
 
-
     @route.delete('/{company_metric_id}', response= {200: Dict[str, str], 404: ErrorResponse, 500: ErrorResponse})
     def delete(self,company_metric_id: int):
         """
@@ -279,12 +276,24 @@ class CompanyMetricsController:
 
         return self.services.delete(id=company_metric_id)
     
-    @route.put('/{date_company_metric}', response= {200: CompanyMetricsGetSchema, 404: ErrorResponse, 500: ErrorResponse})
-    def put(self, request, date_company_metric: str, payload: CompanyMetricsPutSchema = Body(...)):
-        """
-        Rota para Atualizar uma CompanyMetrics pela data de criação.
-        """
-        return self.services.update_by_date(date_company_metric=date_company_metric, payload=payload.dict())
+    # @route.put('/{date_company_metric}', response= {200: CompanyMetricsGetSchema, 404: ErrorResponse, 500: ErrorResponse})
+    # def put(self, request, date_company_metric: str, payload: CompanyMetricsPutSchema = Body(...)):
+    #     """
+    #     Rota para Atualizar uma CompanyMetrics pela data de criação.
+    #     """
+    #     return self.services.update_by_date(date_company_metric=date_company_metric, payload=payload.dict())
+
+        
+
+    @route.post("/get_by_date/{date_company_metric}/{id}", response={200: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def get_by_date(self, request, date_company_metric: str, id: int, payload: CompanyMetricsPutSchema = Body(...)):
+        response = CompanyMetricsServices.update_metrics_by_date(date_recorded=date_company_metric, id=id)
+        
+        if not response:
+            return 400, {"error": "Register not found"}
+        
+        return 200, response
+
 
 
 @api_controller(
@@ -314,7 +323,7 @@ class RecordController:
     @route.get('/{id}/', response= {200: RecordOutSchema, 404: ErrorResponse, 500: ErrorResponse})
     def get(self, request, id: int):
         """
-        Rota para Listar um Bioma por ID.
+        Rota para Listar uma empresa por ID.
         """
         return self.services.get(id=id)
     @route.put('/{id}/', response= {201: RecordOutSchema, 400: ErrorResponse, 500: ErrorResponse})

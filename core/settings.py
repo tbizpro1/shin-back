@@ -7,7 +7,7 @@ import cloudinary
 # Diretório base e configuração do ambiente
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-ENVIRONMENT = os.getenv('DJANGO_ENV', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENV', 'local')
 print(f"ENVIRONMENT: {ENVIRONMENT}")
 
 # Carregar variáveis de ambiente com base no ambiente
