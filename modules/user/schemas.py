@@ -7,7 +7,6 @@ from datetime import datetime, date
 
 from ..utils.validator_cpf import validar_cpf
 class RoleFilterEnum(str, Enum):
-    admin = "admin"
     user = "user"
 
 

@@ -9,6 +9,27 @@ from datetime import  date, datetime
 from ninja import FilterSchema, Schema, Field
 from pydantic import BaseModel, EmailStr
 
+class BusinessModelEnum(str, Enum):
+    NAO_SEI = "Não sei"
+    AFILIADOS = "Afiliados / Marketing de influência"
+    CONTEUDO_PREMIUM = "Conteúdo premium / Licenciamento de conteúdo / Educação on-line"
+    COOPERATIVA = "Cooperativa"
+    SOFTWARE_HOUSE = "Software house"
+    ECOMMERCE = "E-commerce"
+    MARKETPLACE = "Marketplace"
+    SAAS = "SAAS - Software como serviço"
+    HAAS = "HAAS - Hardware como serviço"
+    INDUSTRIA = "Indústria: Fabricação e venda direta online ou offline"
+    EDUCACAO_ONLINE = "Educação on-line"
+    COMERCIO_OFFLINE = "Comércio Offline"
+    SERVICO_OFFLINE = "Serviço Offline"
+    EDUCACAO_OFFLINE = "Educação off-line"
+    INTERMEDIACAO = "Intermediação de negócios"
+    NEGOCIO_SOCIAL = "Negócio social"
+    PUBLICIDADE = "Publicidade"
+    OUTROS = "Outros"
+
+
 class StateEnum(str, Enum):
     AC = "AC"
     AL = "AL"
@@ -325,25 +346,6 @@ class RecordPutSchema(BaseModel):
     data_type: Optional[RecordTypeEnum] = None
     cycle: Optional[CycleEnum]
 
-class BusinessModelEnum(str, Enum):
-    NAO_SEI = "Não sei"
-    AFILIADOS = "Afiliados / Marketing de influência"
-    CONTEUDO_PREMIUM = "Conteúdo premium / Licenciamento de conteúdo / Educação on-line"
-    COOPERATIVA = "Cooperativa"
-    SOFTWARE_HOUSE = "Software house"
-    ECOMMERCE = "E-commerce"
-    MARKETPLACE = "Marketplace"
-    SAAS = "SAAS - Software como serviço"
-    HAAS = "HAAS - Hardware como serviço"
-    INDUSTRIA = "Indústria: Fabricação e venda direta online ou offline"
-    EDUCACAO_ONLINE = "Educação on-line"
-    COMERCIO_OFFLINE = "Comércio Offline"
-    SERVICO_OFFLINE = "Serviço Offline"
-    EDUCACAO_OFFLINE = "Educação off-line"
-    INTERMEDIACAO = "Intermediação de negócios"
-    NEGOCIO_SOCIAL = "Negócio social"
-    PUBLICIDADE = "Publicidade"
-    OUTROS = "Outros"
 
 
 class EnterprisePostSchema(Schema):
