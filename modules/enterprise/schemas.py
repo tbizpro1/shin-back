@@ -404,6 +404,7 @@ class CompanyMetricsFilterSchema(FilterSchema):
     capital_needed: Optional[float] = None  
     value_foment: Optional[float] = None
     valuation: Optional[str] = None
+    enterprise_id: Optional[int] = None
 
     
 class CompanyMetricsListSchema(Schema):

@@ -29,3 +29,27 @@ class DataAnalisysService:
             "labels": [item["discovered_startup"] for item in data_discovery],
             "data": [item["count"] for item in data_discovery],
         }
+    
+    @staticmethod
+    def get_partners_distribution():
+        """
+        Retorna a quantidade de sócios ao longo do tempo para o frontend.
+        """
+        data_partners = DataAnalisysRepository.get_partners_count_over_time()
+
+        return {
+            "labels": [item["date_recorded"].strftime("%Y-%m-%d") for item in data_partners],
+            "data": [item["total_partners"] for item in data_partners],
+        }
+    
+    @staticmethod
+    def get_team_size_distribution(enterprise_id: int):
+        """
+        Retorna a quantidade de colaboradores ao longo do tempo para o frontend.
+        """
+        data_collaborators = DataAnalisysRepository.get_team_size_over_time(enterprise_id)
+
+        return {
+            "labels": [item["date_recorded"].strftime("%Y-%m-%d") for item in data_collaborators],
+            "data": [item["total_collaborators"] for item in data_collaborators],
+        }

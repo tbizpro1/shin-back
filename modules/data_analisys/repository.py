@@ -1,5 +1,5 @@
 from django.db.models import Count,Sum
-from ..enterprise.models import Enterprise, Record
+from ..enterprise.models import Enterprise, Record,CompanyMetrics
 from django.db.models.functions import TruncDate
 
 class DataAnalisysRepository:
@@ -73,3 +73,17 @@ class DataAnalisysRepository:
         )
 
         return [{"date": item["date"], "total_revenue": item["total_revenue"]} for item in queryset]
+    
+    
+    
+    @staticmethod
+    def get_team_size_over_time(enterprise_id: int):
+        """
+        Retorna a quantidade de colaboradores ao longo do tempo para uma empresa específica.
+        """
+        return (
+            CompanyMetrics.objects.filter(enterprise_id=enterprise_id)
+            .values("date_recorded")
+            .annotate(total_collaborators=Sum("team_size"))
+            .order_by("date_recorded")
+        )
