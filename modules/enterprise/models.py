@@ -209,8 +209,6 @@ class CompanyMetrics(models.Model):
         null=True, 
         help_text="Necessidade de capital caso a rodada esteja aberta"
     )
-    
-    value_invested = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     value_foment = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     valuation = models.CharField(
         max_length=255, 

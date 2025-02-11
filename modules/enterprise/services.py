@@ -35,7 +35,7 @@ def validate_company_metrics_payload(payload: Dict[str, Any]) -> Optional[Dict[s
                 errors[field] = f"O campo '{field}' deve ser um número inteiro positivo."
 
     # Validar campos decimais positivos
-    for field in ["revenue_period", "capital_needed", "value_invested", "value_foment"]:
+    for field in ["revenue_period", "capital_needed", "value_foment"]:
         value = payload.get(field)
         if value is not None:
             try:
@@ -398,7 +398,6 @@ class CompanyMetricsServices:
                     new_clients=company_metrics.new_clients,
                     investment_round_open=company_metrics.investment_round_open,
                     capital_needed=company_metrics.capital_needed,
-                    value_invested=company_metrics.value_invested,
                     value_foment=company_metrics.value_foment,
                     valuation=company_metrics.valuation
                 )
@@ -444,8 +443,7 @@ class CompanyMetricsServices:
     "total_clients": response_dict["total_clients"],
     "new_clients": response_dict["new_clients"],
     "investment_round_open": response_dict["investment_round_open"],
-    "capital_needed": float(response_dict["capital_needed"]),  # Convertendo Decimal para float
-    "value_invested": float(response_dict["value_invested"]),  # Convertendo Decimal para float
+    "capital_needed": float(response_dict["capital_needed"]),  # Convertendo Decimal para float  # Convertendo Decimal para float
     "value_foment": float(response_dict["value_foment"]),  # Convertendo Decimal para float
     "valuation": response_dict["valuation"],
     "date_recorded": response_dict["date_recorded"].isoformat()  # Convertendo datetime para string

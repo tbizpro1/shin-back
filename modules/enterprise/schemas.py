@@ -255,7 +255,6 @@ class CompanyMetricsPostSchema(Schema):
     new_clients:int = Field(None, alias="new_clients", title="Número de novos clientes durante o período")
     investment_round_open:bool = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
     capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
-    value_invested:float = Field(None, alias="value_invested", title="Valor investido")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
 
@@ -268,7 +267,6 @@ class CompanyMetricsGetSchema(Schema):
     new_clients:int = Field(None, alias="new_clients", title="Número de novos clientes durante o período")
     investment_round_open:bool = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
     capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
-    value_invested:float = Field(None, alias="value_invested", title="Valor investido")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)")
     date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
@@ -283,7 +281,6 @@ class CompanyMetricsPutSchema(Schema):
     new_clients: Optional[int] = Field(None, alias="new_clients", title="Número de novos clientes durante o período")
     investment_round_open: Optional[bool] = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
     capital_needed: Optional[float] =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
-    value_invested: Optional[float] = Field(None, alias="value_invested", title="Valor investido")  
     value_foment: Optional[float] = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation: Optional[str] = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
 
@@ -300,6 +297,7 @@ class RecordInSchema(BaseModel):
     observations: Optional[str] = Field(None, max_length=500)
     data_type: RecordTypeEnum
     cycle: CycleEnum
+    market: MarketEnum
 
 class RecordMinimalSchema(Schema):
     id: int
@@ -361,7 +359,7 @@ class EnterprisePostSchema(Schema):
     foundation_year: Optional[int] = Field(None, title="Ano de Fundação")
     city: Optional[str] = Field(None, title="Cidade")
     state: StateEnum = Field(None, title="Estado")
-    market: Optional[MarketEnum] = Field(None, title="Mercado")
+    market:MarketEnum = Field(None, title="Mercado")
     segment: Optional[str] = Field(None, title="Segmento Inicial")
     problem: Optional[str] = Field(None, title="Problema Resolvido")
     solution: Optional[str] = Field(None, title="Solução")
@@ -391,15 +389,8 @@ class CompanyMetricsPostSchema(Schema):
     new_clients:int = Field(None, alias="new_clients", title="Número de novos clientes durante o período")
     investment_round_open:bool = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
     capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
-    value_invested:float = Field(None, alias="value_invested", title="Valor investido")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
-
-
-
-
-
-
 
 class ErrorResponse(Schema):
     message: str
@@ -411,7 +402,6 @@ class CompanyMetricsFilterSchema(FilterSchema):
     new_clients: Optional[int] = None
     investment_round_open: Optional[bool] = None
     capital_needed: Optional[float] = None  
-    value_invested: Optional[float] = None 
     value_foment: Optional[float] = None
     valuation: Optional[str] = None
 
