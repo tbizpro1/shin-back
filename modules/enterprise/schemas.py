@@ -60,6 +60,20 @@ class StateEnum(str, Enum):
     SE = "SE"
     TO = "TO"
 
+class RevenueModelEnum(str, Enum):
+    NAO_SEI = "Não sei"
+    AFILIADOS = "Afiliados"
+    ANUNCIO = "Anúncio"
+    ASSINATURA = "Assinatura"
+    FREEMIUM = "Freemium"
+    LICENCIAMENTO = "Licenciamento"
+    INTERMEDIACAO = "Intermediação de Negócios"
+    PAY_PER_USE = "Pay per Use"
+    VENDA_HARDWARE = "Venda de Hardware ou produto físico"
+    VENDA_DIRETA = "Venda Direta"
+    TRANSACIONAL = "Transacional"
+    OUTRO = "Outro"
+
 class CycleEnum(str, Enum):
     STARTUP_PIAUI_1 = "Startup Piaui 1"
     STARTUP_PIAUI_2 = "Startup Piaui 2"
@@ -193,7 +207,7 @@ class EnterprisePutSchema(BaseModel):
     differential: Optional[str] = Field(None, alias="differential", title="Diferencial")
     competitors: Optional[str] = Field(None, alias="competitors", title="Concorrentes")
     business_model: Optional[BusinessModelEnum] = Field(None, alias="business_model", title="Modelo de Negócio")
-    revenue_model: Optional[str] = Field(None, alias="revenue_model", title="Modelo de Receita")
+    revenue_model: Optional[RevenueModelEnum] = Field(None, alias="revenue_model", title="Modelo de Receita")
     invested: Optional[bool] = Field(None, alias="invested", title="Já foi investida?")
     investment_value: Optional[float] = Field(None, alias="investment_value", title="Valor Investido")
     boosting: Optional[bool] = Field(None, alias="boosting", title="Recebeu Fomento?")
@@ -231,7 +245,7 @@ class EnterpriseListSchema(BaseModel):
     differential: Optional[str] = None
     competitors: Optional[str] = None
     business_model: Optional[BusinessModelEnum] = None
-    revenue_model: Optional[str] = None
+    revenue_model: RevenueModelEnum = None
     invested: Optional[bool] = False
     investment_value: Optional[float] = None
     boosting: Optional[bool] = False
@@ -370,7 +384,7 @@ class EnterprisePostSchema(Schema):
     differential: str
     competitors: str
     business_model: BusinessModelEnum = Field(None, title="Modelo de Negócio")
-    revenue_model: Optional[str] = Field(None, title="Modelo de Receita")
+    revenue_model:RevenueModelEnum = Field(None, title="Modelo de Receita")
     invested: Optional[bool] = Field(False, title="Já recebeu investimento?")
     investment_value: Optional[float] = Field(None, title="Valor Investido")
     boosting: Optional[bool] = Field(False, title="Recebeu fomento?")

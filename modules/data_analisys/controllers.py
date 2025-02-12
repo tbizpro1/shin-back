@@ -16,12 +16,12 @@ class DataAnalisysController:
     """
     Controller para gerenciar operações relacionadas ao modelo Enterprise.
     """
-    @route.get("/discovery-source-distribution")
-    def get_discovery_source_distribution(self)-> dict:
-        """
-        Endpoint para retornar a distribuição de startups por fonte de descoberta.
-        """
-        return DataAnalisysService.discovery_source_distribution()    
+    # @route.get("/discovery-source-distribution")
+    # def get_discovery_source_distribution(self)-> dict:
+    #     """
+    #     Endpoint para retornar a distribuição de startups por fonte de descoberta.
+    #     """
+    #     return DataAnalisysService.discovery_source_distribution()    
     
     @route.get("/captable", response={200: CaptableResponse, 404: ErrorResponse, 500: ErrorResponse})
     def get_captable_data(self, request, enterprise_id: int):
@@ -58,12 +58,12 @@ class DataAnalisysController:
         except Exception as e:
             return 500, ErrorResponse(message=f"Error: {str(e)}")
 
-    @http_get("/partners-distribution")
-    def get_partners_distribution(self):
-        """
-        Endpoint para retornar a quantidade de sócios ao longo do tempo.
-        """
-        return DataAnalisysService.get_partners_distribution()
+    # @http_get("/partners-distribution")
+    # def get_partners_distribution(self):
+    #     """
+    #     Endpoint para retornar a quantidade de sócios ao longo do tempo.
+    #     """
+    #     return DataAnalisysService.get_partners_distribution()
     
     @http_get("/team-size-distribution")
     def get_team_size_distribution(self, enterprise_id: int = Query(...)):

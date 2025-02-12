@@ -9,11 +9,56 @@ from ..utils.validator_cpf import validar_cpf
 class RoleFilterEnum(str, Enum):
     user = "user"
 
+class StateEnum(str, Enum):
+    AC = "AC"
+    AL = "AL"
+    AP = "AP"
+    AM = "AM"
+    BA = "BA"
+    CE = "CE"
+    DF = "DF"
+    ES = "ES"
+    GO = "GO"
+    MA = "MA"
+    MT = "MT"
+    MS = "MS"
+    MG = "MG"
+    PA = "PA"
+    PB = "PB"
+    PR = "PR"
+    PE = "PE"
+    PI = "PI"
+    RJ = "RJ"
+    RN = "RN"
+    RS = "RS"
+    RO = "RO"
+    RR = "RR"
+    SC = "SC"
+    SP = "SP"
+    SE = "SE"
+    TO = "TO"
+
+class EducationLevelEnum(str, Enum):
+    SEM_ESCOLARIDADE = "Sem escolaridade"
+    ENSINO_FUNDAMENTAL = "Ensino Fundamental"
+    ENSINO_MEDIO = "Ensino Médio"
+    GRADUACAO = "Graduação"
+    ESPECIALIZACAO = "Especialização"
+    MESTRADO = "Mestrado"
+    DOUTORADO = "Doutorado"
+    POS_DOUTORADO = "Pós-Doutorado"
 
 class GenderEnum(str, Enum):
     m = "m"
     f = "f"
     n = "p"
+
+class EthnicityEnum(str, Enum):
+    BRANCA = "Branca"
+    PRETA = "Preta"
+    PARDA = "Parda"
+    AMARELA = "Amarela"
+    INDIGENA = "Indígena"
 
 
 class UserPostSchema(Schema):
@@ -24,11 +69,11 @@ class UserPostSchema(Schema):
     linkedin: Optional[str] = None
     profession: Optional[str] = None
     role: RoleFilterEnum
-    state: Optional[str] = None
+    state: StateEnum = None
     gender: GenderEnum = None
     institution: Optional[str] = None
-    education_level: Optional[str] = None
-    ethnicity: Optional[str] = None
+    education_level: EducationLevelEnum = None
+    ethnicity: EthnicityEnum = None
     city: Optional[str] = None
     whatsapp_number: Optional[str] = None
     weekly_hours_worked: Optional[int] = None
@@ -56,11 +101,11 @@ class UserPutSchema(Schema):
     linkedin: Optional[str] = Field(None, alias="linkedin", title="LinkedIn")
     profession: Optional[str] = Field(None, alias="profession", title="Profissão")
     role: Optional[RoleFilterEnum] = None
-    state: Optional[str] = None
+    state: StateEnum = None
     gender: Optional[GenderEnum] = None
     institution: Optional[str] = None
-    education_level: Optional[str] = None
-    ethnicity: Optional[str] = None
+    education_level: Optional[EducationLevelEnum] = None
+    ethnicity: EthnicityEnum = None
     city: Optional[str] = None
     whatsapp_number: Optional[str] = None
     weekly_hours_worked: Optional[int] = None
@@ -82,11 +127,11 @@ class UserListSchema(Schema):
     profession: Optional[str] = None
     role: str
     profile_picture: Optional[str] = None
-    state: Optional[str] = None
+    state: StateEnum = None
     gender: Optional[GenderEnum] = None
     institution: Optional[str] = None
-    education_level: Optional[str] = None
-    ethnicity: Optional[str] = None
+    education_level: Optional[EducationLevelEnum] = None
+    ethnicity: EthnicityEnum = None
     city: Optional[str] = None
     whatsapp_number: Optional[str] = None
     weekly_hours_worked: Optional[int] = None
@@ -123,11 +168,11 @@ class RegisterSchema(Schema):
     linkedin: Optional[str] = None
     profession: Optional[str] = None
     role: RoleFilterEnum
-    state: Optional[str] = None
+    state: StateEnum = None
     gender: Optional[GenderEnum] = None
     institution: Optional[str] = None
-    education_level: Optional[str] = None
-    ethnicity: Optional[str] = None
+    education_level: Optional[EducationLevelEnum] = None
+    ethnicity: EthnicityEnum = None
     city: Optional[str] = None
     whatsapp_number: Optional[str] = None
     weekly_hours_worked: Optional[int] = None
@@ -147,11 +192,11 @@ class RegisterResponseSchema(Schema):
     phone: Optional[str] = None
     linkedin: Optional[str] = None
     profession: Optional[str] = None
-    state: Optional[str] = None
+    state: StateEnum = None
     gender: Optional[GenderEnum] = None
     institution: Optional[str] = None
-    education_level: Optional[str] = None
-    ethnicity: Optional[str] = None
+    education_level: Optional[EducationLevelEnum] = None
+    ethnicity: EthnicityEnum = None
     city: Optional[str] = None
     whatsapp_number: Optional[str] = None
     weekly_hours_worked: Optional[int] = None

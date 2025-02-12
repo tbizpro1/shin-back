@@ -12,6 +12,51 @@ class User(AbstractUser):
     ('f', 'Female'),
     ('n', 'Prefer not to say'),
     )
+    class state_choices(models.TextChoices):
+        AC = "AC", "Acre"
+        AL = "AL", "Alagoas"
+        AP = "AP", "Amapá"
+        AM = "AM", "Amazonas"
+        BA = "BA", "Bahia"
+        CE = "CE", "Ceará"
+        DF = "DF", "Distrito Federal"
+        ES = "ES", "Espírito Santo"
+        GO = "GO", "Goiás"
+        MA = "MA", "Maranhão"
+        MT = "MT", "Mato Grosso"
+        MS = "MS", "Mato Grosso do Sul"
+        MG = "MG", "Minas Gerais"
+        PA = "PA", "Pará"
+        PB = "PB", "Paraíba"
+        PR = "PR", "Paraná"
+        PE = "PE", "Pernambuco"
+        PI = "PI", "Piauí"
+        RJ = "RJ", "Rio de Janeiro"
+        RN = "RN", "Rio Grande do Norte"
+        RS = "RS", "Rio Grande do Sul"
+        RO = "RO", "Rondônia"
+        RR = "RR", "Roraima"
+        SC = "SC", "Santa Catarina"
+        SP = "SP", "São Paulo"
+        SE = "SE", "Sergipe"
+        TO = "TO", "Tocantins"
+
+    class EducationLevelChoices(models.TextChoices):
+        SEM_ESCOLARIDADE = "Sem escolaridade", "Sem escolaridade"
+        ENSINO_FUNDAMENTAL = "Ensino Fundamental", "Ensino Fundamental"
+        ENSINO_MEDIO = "Ensino Médio", "Ensino Médio"
+        GRADUACAO = "Graduação", "Graduação"
+        ESPECIALIZACAO = "Especialização", "Especialização"
+        MESTRADO = "Mestrado", "Mestrado"
+        DOUTORADO = "Doutorado", "Doutorado"
+        POS_DOUTORADO = "Pós-Doutorado", "Pós-Doutorado"
+    
+    class ethnicity_choices(models.TextChoices):
+        BRANCA = "Branca", "Branca"
+        PRETA = "Preta", "Preta"
+        PARDA = "Parda", "Parda"
+        AMARELA = "Amarela", "Amarela"
+        INDIGENA = "Indígena", "Indígena"
 
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=50, unique=True)
@@ -25,11 +70,11 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='user', null=True, blank=True)
     profile_picture = models.URLField(max_length=255, null=True, blank=True)
-    state = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=100,choices=state_choices.choices, null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     institution = models.CharField(max_length=255, null=True, blank=True)
-    education_level = models.CharField(max_length=255, null=True, blank=True)
-    ethnicity = models.CharField(max_length=255, null=True, blank=True)
+    education_level = models.CharField(max_length=255,choices=EducationLevelChoices.choices, null=True, blank=True)
+    ethnicity = models.CharField(max_length=255,choices=ethnicity_choices.choices, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     whatsapp_number = models.CharField(max_length=15, null=True, blank=True, default='')
     weekly_hours_worked = models.IntegerField(null=True, blank=True)

@@ -51,7 +51,19 @@ class Enterprise(models.Model):
         PUBLICIDADE = "Publicidade", "Publicidade"
         OUTROS = "Outros", "Outros"
 
-
+    class revenue_model_choices(models.TextChoices):
+        NAO_SEI = "Não sei", "Não sei"
+        AFILIADOS = "Afiliados", "Afiliados"
+        ANUNCIO = "Anúncio", "Anúncio"
+        ASSINATURA = "Assinatura", "Assinatura"
+        FREEMIUM = "Freemium", "Freemium"
+        LICENCIAMENTO = "Licenciamento", "Licenciamento"
+        INTERMEDIACAO = "Intermediação de Negócios", "Intermediação de Negócios"
+        PAY_PER_USE = "Pay per Use", "Pay per Use"
+        VENDA_HARDWARE = "Venda de Hardware ou produto físico", "Venda de Hardware ou produto físico"
+        VENDA_DIRETA = "Venda Direta", "Venda Direta"
+        TRANSACIONAL = "Transacional", "Transacional"
+        OUTRO = "Outro", "Outro"
 
     class market_choices(models.TextChoices):
         AGRICULTURE_LIVESTOCK = "Agricultura e Pecuária", "Agricultura e Pecuária"
@@ -172,7 +184,7 @@ class Enterprise(models.Model):
     competitive_differential = models.TextField(help_text="Descreva o benefício único oferecido ao cliente", default="Não especificado")
     competitors = models.TextField(help_text="Conte quem são seus principais competidores ou substitutivos")
     business_model = models.CharField(max_length=255,choices=BusinessModelChoices.choices, null=True, blank=True, help_text="Selecione o modelo de negócio")
-    revenue_model = models.CharField(max_length=255, null=True, blank=True, help_text="Selecione o modelo de receita")
+    revenue_model = models.CharField(max_length=255,choices=revenue_model_choices.choices, null=True, blank=True, help_text="Selecione o modelo de receita")
     differential = models.TextField(null=True, blank=True, help_text="Diferencial competitivo da startup")
 
     # Investment Information
