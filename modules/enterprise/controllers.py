@@ -18,7 +18,7 @@ from modules.enterprise.schemas import (
 )
 import requests
 from modules.user_enterprise.repository import UserEnterpriseRepository
-from typing import List, Dict,Any
+from typing import List, Dict,Any, Union
 from ninja import Form, File, UploadedFile,Query,Body
 from ..logs.services import LogService
 from django.http import JsonResponse
@@ -234,6 +234,27 @@ class CompanyMetricsController:
     services = CompanyMetricsServices
    # Instância do LogService
 
+    @route.post("/open_captable", response={200: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
+    def open_captable(self,request, enterprise_id: int, captable_percentage: float) -> Union[CompanyMetricsGetSchema, ErrorResponse]:
+        """
+        Endpoint para abrir a captable de uma empresa e atualizar os dados.
+        """
+        try:
+            status, response = self.services.open_captable(
+                enterprise_id=enterprise_id,
+                captable_percentage=captable_percentage
+            )
+
+            if status == 200:
+                return response
+            elif status == 404:
+                return 400, {"message": "Empresa não encontrada"}
+            else:
+                return 500, {"message": "Erro inesperado ao atualizar captable"}
+
+        except Exception as e:
+            return 500, {"message": f"Erro interno: {str(e)}"}
+
     @route.get("/", response={200: List[CompanyMetricsGetSchema]})
     def list(self, request, filters: CompanyMetricsFilterSchema = Query(...)):
         """
@@ -242,6 +263,7 @@ class CompanyMetricsController:
         # Obtendo os dados com base nos filtros
         queryset = self.services.list(filters=filters.dict(exclude_none=True))
         return queryset
+    
     @route.put('/{id}', response= {201: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: CompanyMetricsPutSchema = Body(...)):
         """

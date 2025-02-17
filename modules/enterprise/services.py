@@ -335,8 +335,35 @@ class CompanyMetricsServices:
     """
     Serviços para operações no modelo Company Metrics.
     """
-
+    Enterprise_repository = EnterpriseRepository
     repository = CompanyMetricsRepository
+
+    @classmethod
+    def open_captable(cls, *, enterprise_id: int, captable_percentage: float):
+        """
+        Serviço para abrir a captable de uma empresa.
+        Verifica se a empresa existe e chama o repositório para atualizar ou criar o registro.
+
+        :param enterprise_id: ID da empresa (Enterprise)
+        :param captable_percentage: Porcentagem da captable (exemplo: 12.5 para 12,5%)
+        :return: Dicionário com status e mensagem
+        """
+        try:
+            # Verifica se a empresa existe
+            enterprise = EnterpriseRepository.get(id=enterprise_id)
+
+            # Chama o repositório para atualizar a captable
+            status, response = CompanyMetricsRepository.open_captable(
+                enterprise_id=enterprise.enterprise_id, 
+                captable_percentage=captable_percentage
+            )
+            print(f"response: {response} status: {status}")
+
+            return status, response
+
+        except Exception:
+            return 404, {"message": "Empresa não encontrada"}
+
     @classmethod
     def get(cls, *, id: int) -> Tuple[int, models.Model | Dict[str, str]]:
         try:

@@ -221,10 +221,25 @@ class CompanyMetrics(models.Model):
         null=True, 
         help_text="Necessidade de capital caso a rodada esteja aberta"
     )
+    created_time = models.TimeField(auto_now_add=True, help_text="Hora exata da criação do registro")
+    captable = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        help_text="Porcentagem de participação acionária (exemplo: 12.50 para 12,5%)"
+    )
     value_foment = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     valuation = models.CharField(
         max_length=255, 
         help_text="Valor estimado do negócio (ou escreva NÃO SEI)"
+    )
+    current_capital = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        help_text="Capital atual da empresa"
     )
 
     def __str__(self):

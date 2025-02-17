@@ -270,7 +270,10 @@ class CompanyMetricsPostSchema(Schema):
     investment_round_open:bool = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
     capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
-    valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
+    valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)")
+    current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
+    captable:Optional[float] = Field(None, alias="captable", title="Captable")
+
 
 class CompanyMetricsGetSchema(Schema):
     id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
@@ -284,6 +287,9 @@ class CompanyMetricsGetSchema(Schema):
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)")
     date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
+    current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
+    captable:Optional[float] = Field(None, alias="captable", title="Captable")
+
     class Config:
         # Isso garante que ao fazer a conversão com from_orm, ele consiga mapear o valor correto
         orm_mode = True
@@ -297,7 +303,9 @@ class CompanyMetricsPutSchema(Schema):
     capital_needed: Optional[float] =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
     value_foment: Optional[float] = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation: Optional[str] = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
-
+    current_capital: Optional[float] = Field(None, alias="current_capital", title="Capital atual")
+    captable:Optional[float] = Field(None, alias="captable", title="Captable")
+    date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
 class RecordInSchema(BaseModel):
     enterprise: int
     date_collected: date
@@ -405,7 +413,8 @@ class CompanyMetricsPostSchema(Schema):
     capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
     value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
-
+    current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual")
+    captable:Optional[float] = Field(None, alias="captable", title="Captable")
 class ErrorResponse(Schema):
     message: str
 

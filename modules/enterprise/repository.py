@@ -9,6 +9,8 @@ from ..user_enterprise.repository import UserEnterpriseRepository
 from cloudinary.uploader import upload
 from django.db.models import Q
 
+
+
 class EnterpriseRepository:
     """
     Repositório para a modelagem de Enterprise.
@@ -123,6 +125,40 @@ class CompanyMetricsRepository:
     """
 
     model = CompanyMetrics
+
+
+    @classmethod
+    def open_captable(cls, *, enterprise_id: int, captable_percentage: float):
+        try:
+            # Verifica se a empresa existe
+            if not EnterpriseRepository.get(id=enterprise_id):
+                return 404, {"message": "Empresa não encontrada"}
+
+            # Busca métricas para a empresa
+            company_metrics = CompanyMetrics.objects.filter(enterprise_id=enterprise_id).first()
+
+            if company_metrics:
+                company_metrics.captable = captable_percentage
+
+                # Se investment_round_open for False, torná-lo True
+                if not company_metrics.investment_round_open:
+                    company_metrics.investment_round_open = True
+
+                company_metrics.save()
+                return 200, {"message": "Captable atualizado", "captable": company_metrics.captable}
+
+            # Se não existir, cria um novo registro e define investment_round_open como True
+            company_metrics = CompanyMetrics.objects.create(
+                enterprise_id=enterprise_id,
+                captable=captable_percentage,
+                investment_round_open=True  # Sempre True ao criar um novo
+            )
+
+            return 200, {"message": "Captable criado", "captable": company_metrics.captable}
+
+        except Exception as e:
+            return 500, {"message": f"Erro interno: {str(e)}"}
+
     @classmethod
     def get(cls, *, id: int) -> models.Model:
         """
