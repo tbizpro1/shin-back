@@ -357,7 +357,6 @@ class CompanyMetricsServices:
                 enterprise_id=enterprise.enterprise_id, 
                 captable_percentage=captable_percentage
             )
-            print(f"response: {response} status: {status}")
 
             return status, response
 
@@ -385,7 +384,6 @@ class CompanyMetricsServices:
             CompanyMetricsGetSchema.from_orm(company_metric) for company_metric in queryset
         ]       
 
-        print(f"company_metrics_data: {company_metrics_data}")
         return company_metrics_data
     @classmethod
     def company_metrics_by_id(cls,*,id: int) -> models.QuerySet:

@@ -12,7 +12,6 @@ class LogService:
             change_type (str): Tipo de mudança ('create', 'update', etc.).
         """
         logs = Log.objects.filter(user_id=user_id).order_by("created_at")  # Ordena do mais antigo para o mais novo
-        print(f"logs: {logs.count()}")
         if logs.count() >= 10:
             logs.first().delete()  # Exclui o log mais antigo
 

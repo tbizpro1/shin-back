@@ -20,10 +20,8 @@ class DataAnalisysService:
         Retorna a distribuição de startups por fonte de descoberta no formato adequado.
         """
         data_discovery = DataAnalisysRepository.get_discovery_source_distribution()
-        print(f"Dataaa: {data_discovery}")
 
         data_initial_maturity = DataAnalisysRepository.get_initial_maturity_distribution()
-        print(f"Dataaa: {data_initial_maturity}")
         # Formata os dados para o frontend
         return {
             "labels": [item["discovered_startup"] for item in data_discovery],

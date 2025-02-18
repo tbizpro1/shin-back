@@ -306,6 +306,8 @@ class CompanyMetricsPutSchema(Schema):
     current_capital: Optional[float] = Field(None, alias="current_capital", title="Capital atual")
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
     date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
+
+
 class RecordInSchema(BaseModel):
     enterprise: int
     date_collected: date
@@ -415,6 +417,7 @@ class CompanyMetricsPostSchema(Schema):
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual")
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
+    
 class ErrorResponse(Schema):
     message: str
 

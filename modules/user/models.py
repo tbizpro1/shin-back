@@ -177,7 +177,7 @@ class User(AbstractUser):
     # street = models.CharField(max_length=255, null=True, blank=True)
     # neighborhood = models.CharField(max_length=255, null=True, blank=True)
     # number = models.CharField(max_length=10, null=True, blank=True)
-    cpf = models.CharField(max_length=14, unique=True, null=True, blank=True)  # Novo campo CPF
+    cpf = models.CharField(max_length=14, null=True, blank=True)  # Novo campo CPF
 
     REQUIRED_FIELDS = ['username', 'password']
     USERNAME_FIELD = 'email'

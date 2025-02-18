@@ -39,7 +39,6 @@ class DataAnalisysController:
 
             # Captable (retorna exatamente o que está armazenado)
             captable_percentage = float(metrics.captable or 0.0)
-            print(f"Captable: {metrics.__dict__}")
 
             # Novo nome do campo de investimento
             value_investment = float(enterprise.investment_value or Decimal(0))
