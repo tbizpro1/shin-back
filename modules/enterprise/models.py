@@ -201,7 +201,7 @@ class Enterprise(models.Model):
     other_projects = models.TextField(null=True, blank=True, help_text="Informe outros projetos do Programa Startup Piauí que você participa")
     profile_picture = models.URLField(max_length=255, null=True, blank=True)
     discovered_startup = models.CharField(max_length=255, choices=discovery_source_choices.choices, null=True, blank=True, help_text="Onde conheceu o programa?")
-
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Data de criação do registro")
 
     def __str__(self):
         return f"{self.name} - {self.value_proposition[:30]}..."
@@ -209,6 +209,7 @@ class Enterprise(models.Model):
 class CompanyMetrics(models.Model):
     enterprise = models.ForeignKey(Enterprise, on_delete=models.CASCADE, related_name="metrics", help_text="Empresa associada às métricas")
     date_recorded = models.DateField(auto_now_add=True, help_text="Data de registro das métricas")
+    created_time = models.TimeField(auto_now_add=True, help_text="Hora exata da criação do registro")
     team_size = models.IntegerField(help_text="Tamanho do time que não são sócios")
     revenue_period = models.DecimalField(max_digits=12, decimal_places=2, help_text="Receita durante o período")
     total_clients = models.IntegerField(help_text="Número total de clientes durante o período")
@@ -221,7 +222,7 @@ class CompanyMetrics(models.Model):
         null=True, 
         help_text="Necessidade de capital caso a rodada esteja aberta"
     )
-    created_time = models.TimeField(auto_now_add=True, help_text="Hora exata da criação do registro")
+    
     captable = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
@@ -371,6 +372,7 @@ class Record(models.Model):
     observations = models.TextField(max_length=500, help_text="Observações sobre a empresa", blank=True, null=True)
     market = models.CharField(max_length=255,choices=market_choices.choices, null=True, blank=True, help_text="Selecione o mercado que sua startup atua")
     business_model = models.CharField(max_length=255,choices=BusinessModelChoices.choices, null=True, blank=True, help_text="Selecione o modelo de negócio")
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Data de criação do registro")
 
     cycle = models.CharField(
         max_length=50,
