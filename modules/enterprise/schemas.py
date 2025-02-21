@@ -287,6 +287,8 @@ class CompanyMetricsPostSchema(Schema):
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
     partners_count:Optional[int] = Field(None, alias="partners_count", title="Quantidade de sócios")
+    metric_month:MetricMonthEnum = Field(None, alias="metric_month", title="Mês da métrica")
+    metric_year:int = Field(None, alias="metric_year", title="Ano da métrica")
 
 class CompanyMetricsGetSchema(Schema):
     id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
