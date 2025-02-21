@@ -275,3 +275,4 @@ class DataAnalisysController:
 
         except Exception as e:
             return 500, ErrorResponse(message=f"Error: {str(e)}")
+
