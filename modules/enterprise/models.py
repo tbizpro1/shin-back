@@ -149,6 +149,7 @@ class Enterprise(models.Model):
         TRL_7 = 'TRL 7 - Demonstração em ambiente operacional', 'TRL 7 - Demonstração em ambiente operacional'
         TRL_8 = 'TRL 8 - Sistema completo e qualificado', 'TRL 8 - Sistema completo e qualificado'
         TRL_9 = 'TRL 9 - Sistema comprovado em ambiente operacional', 'TRL 9 - Sistema comprovado em ambiente operacional'
+
     cycle = models.CharField(
         max_length=50,
         choices=cycle_choices.choices,
@@ -206,8 +207,30 @@ class Enterprise(models.Model):
     def __str__(self):
         return f"{self.name} - {self.value_proposition[:30]}..."
 
+from django.db import models
+from datetime import datetime
+
 class CompanyMetrics(models.Model):
-    enterprise = models.ForeignKey(Enterprise, on_delete=models.CASCADE, related_name="metrics", help_text="Empresa associada às métricas")
+    class metric_month_choices(models.TextChoices):
+        JANUARY = 'JAN', 'JAN'
+        FEBRUARY = 'FEB', 'FEB'
+        MARCH = 'MAR', 'MAR'
+        APRIL = 'APR', 'APR'
+        MAY = 'MAI', 'MAI'
+        JUNE = 'JUN', 'JUN'
+        JULY = 'JUL', 'JUL'
+        AUGUST = 'AGO', 'AGO'
+        SEPTEMBER = 'SET', 'SET'
+        OCTOBER = 'OUT', 'OUT'
+        NOVEMBER = 'NOV', 'NOV'
+        DECEMBER = 'DEZ', 'DEZ'
+
+    enterprise = models.ForeignKey(
+        "Enterprise", 
+        on_delete=models.CASCADE, 
+        related_name="metrics", 
+        help_text="Empresa associada às métricas"
+    )
     date_recorded = models.DateField(auto_now_add=True, help_text="Data de registro das métricas")
     created_time = models.TimeField(auto_now_add=True, help_text="Hora exata da criação do registro")
     team_size = models.IntegerField(help_text="Tamanho do time que não são sócios")
@@ -222,7 +245,18 @@ class CompanyMetrics(models.Model):
         null=True, 
         help_text="Necessidade de capital caso a rodada esteja aberta"
     )
-    
+    metric_month = models.CharField(
+        max_length=3, 
+        null=True, 
+        blank=True, 
+        choices=metric_month_choices.choices, 
+        help_text="Selecione o período"
+    )
+    metric_year = models.IntegerField(
+        null=True, 
+        blank=True, 
+        help_text="Selecione o ano"
+    )
     captable = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
@@ -249,8 +283,23 @@ class CompanyMetrics(models.Model):
         default=None 
     )
 
+    def save(self, *args, **kwargs):
+        if not self.metric_month:
+            current_month = datetime.now().month
+            month_mapping = {
+                1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR', 5: 'MAI', 6: 'JUN',
+                7: 'JUL', 8: 'AGO', 9: 'SET', 10: 'OUT', 11: 'NOV', 12: 'DEZ'
+            }
+            self.metric_month = month_mapping.get(current_month)
+
+        if not self.metric_year:
+            self.metric_year = datetime.now().year
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Métricas de {self.enterprise.name}"
+        return f"Métricas de {self.enterprise.name} - {self.metric_month}/{self.metric_year}"
+
 
 
 class Record(models.Model):

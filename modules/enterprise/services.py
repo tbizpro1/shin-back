@@ -424,7 +424,13 @@ class CompanyMetricsServices:
                     investment_round_open=company_metrics.investment_round_open,
                     capital_needed=company_metrics.capital_needed,
                     value_foment=company_metrics.value_foment,
-                    valuation=company_metrics.valuation
+                    valuation=company_metrics.valuation,
+                    date_recorded=company_metrics.date_recorded,
+                    current_capital=company_metrics.current_capital,
+                    captable=company_metrics.captable,
+                    partners_count=company_metrics.partners_count,
+                    metric_month=company_metrics.metric_month,
+                    metric_year=company_metrics.metric_year,
                 )
 
                 return status.HTTP_201_CREATED, company_metrics_data.dict()
@@ -471,7 +477,12 @@ class CompanyMetricsServices:
     "capital_needed": float(response_dict["capital_needed"]),  # Convertendo Decimal para float  # Convertendo Decimal para float
     "value_foment": float(response_dict["value_foment"]),  # Convertendo Decimal para float
     "valuation": response_dict["valuation"],
-    "date_recorded": response_dict["date_recorded"].isoformat()  # Convertendo datetime para string
+    "date_recorded": response_dict["date_recorded"].isoformat(),
+    "current_capital": float(response_dict["current_capital"]),
+    "captable": float(response_dict["captable"]),
+    "partners_count": response_dict["partners_count"],
+    "metric_month": response_dict["metric_month"],
+    "metric_year": response_dict["metric_year"],
 }
 
         except Exception as e:

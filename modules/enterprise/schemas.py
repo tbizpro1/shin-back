@@ -183,6 +183,20 @@ class MarketEnum(str, Enum):
     RETAIL_WHOLESALE = "Varejo e Atacado"
     OTHER = "Outro"
 
+class MetricMonthEnum(str, Enum):
+    JANUARY = 'JAN'
+    FEBRUARY = 'FEV'
+    MARCH = 'MAR'
+    APRIL = 'ABR'
+    MAY = 'MAI'
+    JUNE = 'JUN'
+    JULY = 'JUL'
+    AUGUST = 'AGO'
+    SEPTEMBER = 'SET'
+    OCTOBER = 'OUT'
+    NOVEMBER = 'NOV'
+    DECEMBER = 'DEZ'
+
 class EnterprisePutSchema(BaseModel):
     name: Optional[str] = Field(None, alias="name", title="Nome da empresa")
     email: Optional[EmailStr] = Field(None, alias="email", title="Email")
@@ -272,6 +286,7 @@ class CompanyMetricsPostSchema(Schema):
     valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)")
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
+    partners_count:Optional[int] = Field(None, alias="partners_count", title="Quantidade de sócios")
 
 class CompanyMetricsGetSchema(Schema):
     id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
@@ -288,6 +303,8 @@ class CompanyMetricsGetSchema(Schema):
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
     partners_count:Optional[int] = Field(None, alias="partners_count", title="Quantidade de sócios")
+    metric_month:Optional[str] = Field(None, alias="metric_month", title="Mês da métrica")
+    metric_year:Optional[int] = Field(None, alias="metric_year", title="Ano da métrica")
 
     class Config:
         # Isso garante que ao fazer a conversão com from_orm, ele consiga mapear o valor correto
@@ -305,6 +322,9 @@ class CompanyMetricsPutSchema(Schema):
     current_capital: Optional[float] = Field(None, alias="current_capital", title="Capital atual")
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
     date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
+    metric_month:Optional[MetricMonthEnum] = Field(None, alias="metric_month", title="Mês da métrica")
+    metric_year:Optional[int] = Field(None, alias="metric_year", title="Ano da métrica")
+    partners_count:Optional[int] = Field(None, alias="partners_count", title="Quantidade de sócios")
 
 
 class RecordInSchema(BaseModel):
