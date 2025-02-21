@@ -440,6 +440,8 @@ class CompanyMetricsFilterSchema(FilterSchema):
     value_foment: Optional[float] = None
     valuation: Optional[str] = None
     enterprise_id: Optional[int] = None
+    metric_month: Optional[MetricMonthEnum] = None
+    metric_year: Optional[int] = None
 
     
 class CompanyMetricsListSchema(Schema):
@@ -447,4 +449,3 @@ class CompanyMetricsListSchema(Schema):
 
     class Config:
         orm_mode = True
-        
