@@ -277,6 +277,7 @@ class CompanyMetricsController:
         queryset = self.services.list(filters=filters.dict(exclude_none=True))
         return queryset
     
+    
     @route.put('/{id}', response= {201: CompanyMetricsGetSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: CompanyMetricsPutSchema = Body(...)):
         """

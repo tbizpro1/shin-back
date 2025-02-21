@@ -234,3 +234,44 @@ class DataAnalisysController:
             return HttpResponse("Enterprise not found", status=404)
         except Exception as e:
             return HttpResponse(f"Error: {str(e)}", status=500)
+
+    @http_get("/partners-history", response={200: Any, 404: ErrorResponse, 500: ErrorResponse})
+    def get_partners_history(self, enterprise_id: int = Query(...)):
+        """
+        Endpoint para retornar a evolução da quantidade de sócios ao longo dos anos.
+        """
+        try:
+            # Buscar a empresa pelo ID
+            enterprise = Enterprise.objects.get(enterprise_id=enterprise_id)
+            print(f"enterprise: {enterprise.__dict__}")
+            # Filtrar os registros de métricas da empresa ordenados por data
+            metrics = CompanyMetrics.objects.filter(enterprise=enterprise)
+
+
+            if not metrics.exists():
+                return 404, ErrorResponse(message="No partners data found for this enterprise.")
+
+            # Estruturas para armazenar os anos e quantidade de sócios
+            years = []
+            partners_data = []
+            print(f"metrics: {metrics.__dict__}" )
+            # Percorrer os registros e organizar os dados por ano
+            for metric in metrics:
+                year = metric.date_recorded.year
+                if year not in years:
+                    years.append(year)
+                    partners_data.append(int(metric.partners_count or 0))
+
+            # Retorno dos dados no formato esperado para visualização
+            return {
+                "xAxis": [{"data": years}],
+                "series": [{"data": partners_data}],
+                "width": 500,
+                "height": 300
+            }
+
+        except Enterprise.DoesNotExist:
+            return 404, ErrorResponse(message="Enterprise not found")
+
+        except Exception as e:
+            return 500, ErrorResponse(message=f"Error: {str(e)}")

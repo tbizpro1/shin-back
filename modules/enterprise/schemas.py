@@ -447,3 +447,4 @@ class CompanyMetricsListSchema(Schema):
 
     class Config:
         orm_mode = True
+        

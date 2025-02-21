@@ -231,6 +231,7 @@ class CompanyMetrics(models.Model):
         related_name="metrics", 
         help_text="Empresa associada às métricas"
     )
+    
     date_recorded = models.DateField(auto_now_add=True, help_text="Data de registro das métricas")
     created_time = models.TimeField(auto_now_add=True, help_text="Hora exata da criação do registro")
     team_size = models.IntegerField(help_text="Tamanho do time que não são sócios")
