@@ -7,6 +7,7 @@ import uuid
 class RoleEnum(str, Enum):
     owner = "owner"
     partner = "partner"
+    employee = "employee"
 
 class StatusEnum(str, Enum):
     pending = "pending"
@@ -17,6 +18,7 @@ class UserEnterprisePostSchema(Schema):
     user_id: int = Field(..., alias="user_id", title="ID do usuário")
     enterprise_id: int = Field(..., alias="enterprise_id", title="ID da empresa")
     role: RoleEnum = Field(..., alias="role", title="Papel do usuário na empresa")
+    percentage: Optional[float] = Field(None, alias="percentage", title="Porcentagem de participação")
     
 
 class UserEnterprisePutSchema(Schema):
@@ -24,7 +26,7 @@ class UserEnterprisePutSchema(Schema):
     enterprise_id: Optional[int] = Field(None, alias="enterprise_id", title="ID da empresa")
     role: Optional[RoleEnum] = Field(None, alias="role", title="Papel do usuário na empresa")
     status: Optional[StatusEnum] = Field(None, alias="status", title="Status do convite")
-    
+    percentage: Optional[float] = Field(None, alias="percentage", title="Porcentagem de participação")
     send_at: Optional[datetime] = None  
     accept_at: Optional[datetime] = None  
 

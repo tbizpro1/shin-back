@@ -122,15 +122,28 @@ class EnterpriseController:
         Cria uma nova empresa e associa o usuário a ela.
         """
         user_id = request.user.id
-        status_code, created_enterprise = self.services.post(payload=payload.dict(), file=file)
+        payload_dict = payload.dict()
+        owner_percentage = payload_dict.pop("owner_percentage", None)
+
+        status_code, created_enterprise = self.services.post(payload=payload_dict, file=file)
+
         enterprise_id = created_enterprise.enterprise_id
 
+        if owner_percentage is not None and owner_percentage != "":
+            try:
+                percentage = float(owner_percentage) if owner_percentage not in [None, ""] else 100.0
+            except ValueError:
+                raise ValueError(f"Invalid value for owner_percentage: {owner_percentage}. It must be a number.")
+
+        else:
+            percentage = 100.0
         UserEnterpriseRepository.post(
             payload={
                 'user_id': user_id,
                 'enterprise_id': enterprise_id,
                 'role': 'owner',
                 'status': 'accepted',
+                'percentage': percentage
             }
         )
 
@@ -140,7 +153,6 @@ class EnterpriseController:
             description="Você criou uma nova empresa."
         )
 
-        # **Converter `created_enterprise` para `EnterpriseListSchema`**
         enterprise_response = EnterpriseListSchema(
             enterprise_id=created_enterprise.enterprise_id,
             name=created_enterprise.name,
@@ -176,10 +188,11 @@ class EnterpriseController:
             discovered_startup=created_enterprise.discovered_startup,
             other_projects=created_enterprise.other_projects,
             profile_picture=created_enterprise.profile_picture,
-            initial_maturity=created_enterprise.initial_maturity
+            initial_maturity=created_enterprise.initial_maturity,
         )
 
-        return 201, enterprise_response 
+        return 201, enterprise_response
+
 
     @route.put('/{id}', response={200: EnterpriseListSchema, 400: ErrorResponse, 500: ErrorResponse})
     def put(self, request, id: int, payload: EnterprisePutSchema):
@@ -284,7 +297,7 @@ class CompanyMetricsController:
         request, 
         payload: CompanyMetricsPostSchema = Form(...)):
         response = CompanyMetricsServices.create(payload=payload)
-  
+        
  
         if not response:
             return {"error": "register not found"}

@@ -3,7 +3,7 @@ from django.urls import path,include
 from core.api import api
 from django.conf.urls.static import static
 from django.conf import settings
-from django.http import HttpResponse  # Adicionada a importação para HttpResponse
+from django.http import HttpResponse  
 
 
 urlpatterns = [

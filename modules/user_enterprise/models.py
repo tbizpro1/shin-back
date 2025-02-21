@@ -38,8 +38,11 @@ class UserEnterprise(models.Model):
         max_digits=5, 
         decimal_places=2, 
         verbose_name="Porcentagem do sócio na empresa",
-        default=0.00
+        null=True, 
+        blank=True,  
+        default=None 
     )
+
 
     class Meta:
         verbose_name = "User Enterprise"
@@ -47,4 +50,4 @@ class UserEnterprise(models.Model):
         db_table = "user_enterprise"
 
     def __str__(self):
-        return f"{self.user.username} - {self.enterprise.name} - {self.role} ({self.status})"
+        return f"{self.user.username} - {self.enterprise.name} - {self.role} ({self.status}) - {self.percentage}"

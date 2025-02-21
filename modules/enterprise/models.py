@@ -242,6 +242,12 @@ class CompanyMetrics(models.Model):
         blank=True, 
         help_text="Capital atual da empresa"
     )
+    partners_count = models.IntegerField(
+        null=True, 
+        blank=True, 
+        verbose_name="Quantidade de Sócios",
+        default=None 
+    )
 
     def __str__(self):
         return f"Métricas de {self.enterprise.name}"

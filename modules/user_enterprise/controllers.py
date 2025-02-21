@@ -1,5 +1,6 @@
 from ninja_extra import api_controller, route
 from typing import List, Optional, Dict
+from decimal import Decimal
 from modules.user_enterprise.repository import UserEnterpriseRepository
 from modules.user_enterprise.schemas import (
     UserEnterpriseListSchema,
@@ -121,6 +122,13 @@ class UserEnterpriseController:
         """
         Cria uma nova relação UserEnterprise.
         """
+        enterprise_id = payload.enterprise_id
+        new_percentage = payload.percentage
+        if payload.percentage > 100:
+            return JsonResponse({"error": "A porcentagem de participação deve ser menor ou igual a 100%."}, status=400)
+
+        if payload.role == "partner" and payload.percentage <= 0:
+            return JsonResponse({"error": "A porcentagem de participação é obrigatória para sócios."}, status=400)
 
         # Verifica se já existe uma relação entre o usuário e a empresa
         existing_relation = self.repository.get_by_user_and_enterprise(user_id=payload.user_id, enterprise_id=payload.enterprise_id)
@@ -130,7 +138,6 @@ class UserEnterpriseController:
         base_url = request.build_absolute_uri('/')[:-1].strip("/")
         user_email = UserRepository.get(id=payload.user_id).email
 
-        # Cria a nova relação UserEnterprise
         user_enterprise = self.repository.post(payload=payload.dict())
         self.log_service.create_log(
             user_id=user_enterprise.user.id, 
@@ -198,6 +205,7 @@ class UserEnterpriseController:
             "role": user_enterprise.role,
             "status": user_enterprise.status,
             "token": user_enterprise.token,
+            "percentage": user_enterprise.percentage,
         }
 
 

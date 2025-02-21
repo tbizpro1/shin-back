@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional,List
+from typing import Optional,List, Union
 from ninja import Schema, Field,FilterSchema
 from datetime import datetime,date
 from pydantic import EmailStr, HttpUrl,BaseModel
@@ -8,7 +8,6 @@ from typing import Optional, List
 from datetime import  date, datetime
 from ninja import FilterSchema, Schema, Field
 from pydantic import BaseModel, EmailStr
-
 class BusinessModelEnum(str, Enum):
     NAO_SEI = "Não sei"
     AFILIADOS = "Afiliados / Marketing de influência"
@@ -274,7 +273,6 @@ class CompanyMetricsPostSchema(Schema):
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
 
-
 class CompanyMetricsGetSchema(Schema):
     id: Optional[int] = Field(None, alias="id", title="ID da empresa")  # Adicionando o id
     enterprise_id: int =  Field(None, alias="enterprise_id", title="ID da empresa")
@@ -289,6 +287,7 @@ class CompanyMetricsGetSchema(Schema):
     date_recorded: Optional[datetime] = Field(None, alias="date_recorded", title="Data de criação")
     current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual") 
     captable:Optional[float] = Field(None, alias="captable", title="Captable")
+    partners_count:Optional[int] = Field(None, alias="partners_count", title="Quantidade de sócios")
 
     class Config:
         # Isso garante que ao fazer a conversão com from_orm, ele consiga mapear o valor correto
@@ -405,18 +404,8 @@ class EnterprisePostSchema(Schema):
     discovered_startup: DiscoverySourceEnum = Field(None, title="Como conheceu o programa?")
     initial_maturity: MaturityStageBusinessEnum = Field(None, title="Estágio Inicial")
     cycle: CycleEnum = Field(None, title="Ciclo")
-class CompanyMetricsPostSchema(Schema):
-    enterprise: int =  Field(None, alias="enterprise", title="ID da empresa")
-    team_size:int = Field(None, alias="team_size", title="Tamanho do time")
-    revenue_period: float = Field(None, alias="revenue_period", title="periodo de revenda")
-    total_clients:int = Field(None, alias="total_clients", title="total de clientes")
-    new_clients:int = Field(None, alias="new_clients", title="Número de novos clientes durante o período")
-    investment_round_open:bool = Field(None, alias="investment_round_open", title="A empresa está com rodada de investimento aberta?") 
-    capital_needed:float =Field(None, alias="capital_needed", title="Necessidade de capital caso a rodada esteja aberta")  
-    value_foment:float = Field(None, alias="value_foment", title="Valor do fomento")  
-    valuation:str = Field(None, alias="valuation", title="Valor estimado do negócio (ou escreva NÃO SEI)") 
-    current_capital:Optional[float] = Field(None, alias="current_capital", title="Capital atual")
-    captable:Optional[float] = Field(None, alias="captable", title="Captable")
+    owner_percentage: Union[str] = None
+
     
 class ErrorResponse(Schema):
     message: str
